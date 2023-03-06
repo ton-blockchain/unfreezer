@@ -112,13 +112,13 @@ export function useAccountDetails(accountStr: string) {
       unfreezeBlock,
       balance,
       stateInitHashToMatch: accountDetails.state.stateHash,
+      workchain: account.workChain,
     };
   });
 }
 
 export function useUnfreezeTxn(
   accountStr: string,
-  value: BN,
   stateInitHashToMatch?: string,
   unfreezeBlock?: number
 ) {
@@ -158,14 +158,7 @@ export function useUnfreezeTxn(
       }
 
       return {
-        internalMessage: new InternalMessage({
-          to: account,
-          body: new CommonMessageInfo({
-            stateInit,
-          }),
-          value,
-          bounce: false,
-        }),
+        stateInit: c.toBoc().toString("base64"),
         stateInitHash,
       };
     },

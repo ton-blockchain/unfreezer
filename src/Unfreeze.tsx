@@ -2,19 +2,33 @@ import { useState } from "react";
 import { useAccountDetails } from "store/hooks";
 import { useUnfreezeTxn } from "./store/hooks";
 import BN from "bn.js";
-import { InternalMessage } from "ton";
+import { InternalMessage, StateInit, toNano } from "ton";
+import { useConnectionStore } from "store";
+
+/*
+TODOs => 
+- ton connect manifest
+- icon
+- title in nav bar
+- add support for non-TonConnect wallets (or otherwise remove them from menu)
+- styling
+- loading indications
+- error indications
+
+*/
 
 export function Unfreeze() {
   const [address, setAddress] = useState("");
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(0.5);
 
   const { data, isLoading, error } = useAccountDetails(address);
   const { data: unfreezeTxnData, error: unfreezeTxnError } = useUnfreezeTxn(
     address,
-    new BN(value),
     data?.stateInitHashToMatch,
     data?.unfreezeBlock
   );
+
+  const { connectorTC, connection } = useConnectionStore();
 
   return (
     <div>
@@ -58,22 +72,45 @@ export function Unfreeze() {
       {!isLoading && data && (
         <div>
           <div>Account state: {data.accountState}</div>
+          <div>Workchain: {data.workchain}</div>
           <div>Balance: {data.balance}</div>
           {/* TODO can be overridden */}
           <div>Unfreeze block: {data.unfreezeBlock}</div>
           <br />
           <div>Expected state init hash to unfreeze:</div>
-          <div>{data.stateInitHashToMatch}</div>
+          <b>{data.stateInitHashToMatch}</b>
         </div>
       )}
       <div>
         {!!unfreezeTxnError && <div>{unfreezeTxnError.toString()}</div>}
         <div>Actual state init hash:</div>
-        <div>{unfreezeTxnData?.stateInitHash ?? ""}</div>
+        <b>{unfreezeTxnData?.stateInitHash ?? ""}</b>
+        <br />
         <br />
         {/* TODO send the internal message via TC2 */}
         {/* Once we do, we can just invalidate the query in useAccountDetails until state of contract becomes active */}
-        <button disabled={!unfreezeTxnData?.stateInitHash}>Issue TXN</button>
+        <button
+          disabled={!unfreezeTxnData?.stateInitHash || !connectorTC.connected}
+          onClick={() => {
+            console.log(connectorTC.connected, "hi");
+            if (!connectorTC.connected || !unfreezeTxnData) return;
+
+            console.log(unfreezeTxnData.stateInit);
+
+            connectorTC.sendTransaction({
+              messages: [
+                {
+                  address: address,
+                  amount: toNano(value).toString(),
+                  stateInit: unfreezeTxnData.stateInit,
+                },
+              ],
+              validUntil: Date.now() + 3 * 60 * 1000,
+            });
+          }}
+        >
+          Issue TXN
+        </button>
       </div>
     </div>
   );
