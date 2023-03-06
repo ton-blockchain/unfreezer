@@ -7,7 +7,7 @@ import { useConnectionStore } from "store";
 
 /*
 TODOs => 
-- ton connect manifest
+- ton connect manifest => https://ton-community.github.io/unfreezer/, TON Unfreezer
 - icon
 - title in nav bar
 - add support for non-TonConnect wallets (or otherwise remove them from menu)
