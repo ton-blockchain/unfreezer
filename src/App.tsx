@@ -8,6 +8,7 @@ import {
 import { useEffect } from "react";
 import { useGetClientsOnLoad } from "store";
 import { StyledGrid } from "styles";
+import { Unfreeze } from "Unfreeze";
 
 function App() {
   const restoreConnection = useRestoreConnection();
@@ -23,7 +24,9 @@ function App() {
   return (
     <div>
       <Navbar />
-      <StyledApp></StyledApp>
+      <StyledApp>
+        <Unfreeze />
+      </StyledApp>
     </div>
   );
 }
