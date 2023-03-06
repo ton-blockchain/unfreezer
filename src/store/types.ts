@@ -1,9 +1,8 @@
 import { TonConnection, TonWalletProvider } from "@ton-defi.org/ton-connection";
-import { PAGE_SIZE } from "config";
 import { TonClient, TonClient4 } from "ton";
-import { Transaction } from "types";
 import { create } from "zustand";
 import TonConnect from "@tonconnect/sdk";
+import { Transaction } from "types";
 
 export interface PersistedStore {
   clientV2Endpoint?: string;
@@ -21,8 +20,6 @@ export interface PersistedStore {
     apiKey?: string
   ) => void;
 }
-
-
 
 export interface EndpointStore {
   showSetEndpoint: boolean;
@@ -78,4 +75,3 @@ export interface TxStore {
   txLoading: boolean;
   setTxLoading: (txLoading: boolean) => void;
 }
-
