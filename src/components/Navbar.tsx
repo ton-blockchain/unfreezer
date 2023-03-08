@@ -11,8 +11,8 @@ import { makeElipsisAddress } from "utils";
 import { useState } from "react";
 import LogoImg from "assets/logo.svg";
 import { IoLogOutOutline } from "react-icons/io5";
-import { useConnectionStore } from "store";
 import { useResetConnection } from "connection";
+import { useConnectionStore } from "store/store";
 
 export function Navbar() {
   const mobile = useMediaQuery("(max-width:600px)");

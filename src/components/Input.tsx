@@ -9,11 +9,20 @@ interface Props {
   error?: string;
   onFocus?: () => void;
   type?: 'text' | 'password';
+  className?: string
 }
 
-function Input({ value, onChange, label, error, onFocus, type = 'text' }: Props) {
+function Input({
+  value,
+  onChange,
+  label,
+  error,
+  onFocus,
+  type = "text",
+  className = '',
+}: Props) {
   return (
-    <StyledContainer>
+    <StyledContainer className={className}>
       <StyledInput
         onFocus={onFocus}
         variant="outlined"

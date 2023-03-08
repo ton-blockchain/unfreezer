@@ -1,6 +1,9 @@
 import { BASE_ERROR_MESSAGE, LOCAL_STORAGE_PROVIDER } from "config";
 import _ from "lodash";
 import { Wallet } from "ton";
+import { TonConnect } from "@tonconnect/sdk";
+import { isMobile } from "react-device-detect";
+
 export const makeElipsisAddress = (address: string, padding = 6): string => {
   if (!address) return "";
   return `${address.substring(0, padding)}...${address.substring(
@@ -38,7 +41,19 @@ export const Logger = (log: any) => {
   }
 };
 
+export const handleMobileLink = (connectorTC?: TonConnect) => {
+  if (!isMobile) return;
+  const Tonkeeper = connectorTC?.wallet?.device.appName;
 
+  switch (Tonkeeper) {
+    case "Tonkeeper":
+      (window as any).location = "https://app.tonkeeper.com";
+      break;
+
+    default:
+      break;
+  }
+};
 
 export function nFormatter(num: number, digits = 2) {
   const lookup = [

@@ -7,7 +7,6 @@ export * from "./TxReminderPopup";
 export * from "./Input";
 export * from "./ConnectButton";
 export * from "./CloseButton";
-export * from "./NumberDisplay";
 export * from './Notification'
 export * from "./Github";
 export * from "./Tooltip";

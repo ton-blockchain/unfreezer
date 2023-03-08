@@ -6,21 +6,19 @@ import {
   useRestoreConnection,
 } from "connection";
 import { useEffect } from "react";
-import { useGetClientsOnLoad } from "store";
 import { StyledGrid } from "styles";
 import { Unfreeze } from "Unfreeze";
 
 function App() {
   const restoreConnection = useRestoreConnection();
-  const getClients = useGetClientsOnLoad();
   const handleEmbededWallet = useEmbededWallet();
   useConnectionEvenSubscription();
 
   useEffect(() => {
     restoreConnection();
-    getClients();
     handleEmbededWallet();
   }, []);
+
   return (
     <div>
       <Navbar />

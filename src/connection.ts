@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { isWalletInfoInjected, WalletInfoInjected } from "@tonconnect/sdk";
-import { useConnectionStore } from "store";
 import {
   ChromeExtensionWalletProvider,
   TonhubProvider,
@@ -18,6 +17,7 @@ import {
 import { WalletProvider, Provider } from "types";
 import TonConnect from "@tonconnect/sdk";
 import _ from "lodash";
+import { useConnectionStore } from "store/store";
 
 export const useWallets = () => {
   const connector = useConnectionStore().connectorTC;

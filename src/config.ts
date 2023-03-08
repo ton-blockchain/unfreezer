@@ -1,7 +1,5 @@
-import TonKeeperLogo from "assets/tonkeeper.png";
 import TonhubLogo from "assets/tonhub.png";
 import ExtensionLogo from "assets/chrome.svg";
-import OpenMaskLogo from "assets/openmask.svg";
 
 import { Provider, WalletProvider } from "types";
 import { Address } from "ton";
@@ -11,7 +9,6 @@ export const BASE_ERROR_MESSAGE = "Oops, something went wrong";
 
 export const APPROVE_TX = "Please check wallet for pending transaction";
 export const TX_APPROVED_AND_PENDING = "Transaction pending";
-export const TX_FEE = "0.0075";
 
 export const walletAdapters: WalletProvider[] = [
  
@@ -32,8 +29,10 @@ export const walletAdapters: WalletProvider[] = [
 ];
 
 
+// export const manifestUrl = "https://ton-community.github.io/unfreezer";
 export const manifestUrl = "https://ton.vote/tonconnect-manifest.json";
 
+export const TX_FEE = 0.5;
 
 
 
