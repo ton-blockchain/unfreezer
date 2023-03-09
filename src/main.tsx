@@ -30,7 +30,7 @@ const router = createBrowserRouter(
       element: <App />,
     },
   ],
-  { basename: "/unfreezer" }
+  { basename: import.meta.env.BASE_URL }
 );
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

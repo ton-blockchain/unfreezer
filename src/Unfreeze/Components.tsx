@@ -39,11 +39,14 @@ export const ExpectedStateInit = ({
         />
       );
     }
-    return (
-      <AppTooltip text={error}>
-        <IoWarning color="red" style={{ minWidth: 22, minHeight: 22 }} />
-      </AppTooltip>
-    );
+    if (!!error) {
+      return (
+        <AppTooltip text={error}>
+          <IoWarning color="red" style={{ minWidth: 22, minHeight: 22 }} />
+        </AppTooltip>
+      );
+    }
+    return null;
   }, [stateInitHash, error]);
 
   return (

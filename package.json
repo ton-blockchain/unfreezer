@@ -3,7 +3,7 @@
   "private": false,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://ton.vote/",
+  "homepage": "https://ton-community.github.io/unfreezer/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
