@@ -1,6 +1,6 @@
 import { CircularProgress, Fade, styled } from "@mui/material";
 import { Box } from "@mui/system";
-import React from "react";
+import React, { CSSProperties } from "react";
 import { ReactNode } from "react";
 import { StyledFlexRow } from "styles";
 
@@ -9,7 +9,9 @@ interface Props {
   disabled?: boolean;
   isLoading?: boolean;
   className?: string;
-  onClick?: () => void
+  onClick?: () => void;
+  style?: CSSProperties;
+  transparent?: boolean; 
 }
 
 function Button({
@@ -18,16 +20,23 @@ function Button({
   isLoading,
   className = "",
   onClick,
+  style = {},
+  transparent,
 }: Props) {
   return (
     <StyledContainer
+      style={style}
       onClick={onClick}
       disabled={disabled || !!isLoading}
       className={className}
+      transparent={transparent}
     >
       <Fade in={isLoading}>
         <StyledLoader>
-          <CircularProgress className="loader" style={{ width: 30, height: 30 }} />
+          <CircularProgress
+            className="loader"
+            style={{ width: 30, height: 30 }}
+          />
         </StyledLoader>
       </Fade>
       <Fade in={!isLoading}>
@@ -50,24 +59,25 @@ const StyledChildren = styled(StyledFlexRow)({
   gap: 5,
 });
 
-const StyledContainer = styled("button")<{ disabled: boolean }>(
-  ({ theme, disabled }) => ({
-    width: "fit-content",
-    height: 44,
-    borderRadius: 40,
-    opacity: disabled ? 0.7 : 1,
-    pointerEvents: disabled ? "none" : "all",
-    background: theme.palette.primary.main,
-    border: "unset",
-    cursor: "pointer",
-    position: "relative",
-    padding: '0px 16px',
-    transition:'0.3s all',
-    "*": {
-      color: "white",
-      fontSize: 16,
-      fontWeight: 700,
-      fontFamily: theme.typography.fontFamily,
-    },
-  })
-);
+const StyledContainer = styled("button")<{
+  disabled: boolean;
+  transparent?: boolean;
+}>(({ theme, disabled, transparent }) => ({
+  width: "fit-content",
+  height: transparent ? 'unset' : 44,
+  borderRadius: 40,
+  opacity: disabled ? 0.7 : 1,
+  pointerEvents: disabled ? "none" : "all",
+  background: transparent ? "transparent" : theme.palette.primary.main,
+  border: "unset",
+  cursor: "pointer",
+  position: "relative",
+  padding: transparent ? 0 : "0px 16px",
+  transition: "0.3s all",
+  "*": {
+    color: transparent ? theme.palette.primary.main : "white",
+    fontSize: 16,
+    fontWeight: 700,
+    fontFamily: theme.typography.fontFamily,
+  },
+}));

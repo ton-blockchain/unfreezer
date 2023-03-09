@@ -1,10 +1,8 @@
-import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { ReactElement } from "react";
 import { styled } from "@mui/material";
-import { GrClose } from "react-icons/gr";
-import { IconButton, Typography } from "@mui/material";
 import { CloseButton } from "./CloseButton";
+import { Container } from "./Container";
 interface Props {
   children: ReactElement;
   close?: () => void;
@@ -22,43 +20,35 @@ export const Popup = ({
 }: Props) => {
   return (
     <StyledModal open={open} onClose={close} className={className}>
-      <StyledChildren className="children">
-        {close && <CloseButton close={close} />}
-        {title && (
-          <Typography variant="h3" className="popup-title">
-            {title}
-          </Typography>
-        )}
+      <StyledContainer className="children" title={title}>
+        {close && <StyledCloseButton close={close} />}
         {children}
-      </StyledChildren>
+      </StyledContainer>
     </StyledModal>
   );
-}
+};
 
-const StyledChildren = styled(Box)(({ theme }) => ({
-  boxShadow: "0px 0px 25px 0px rgb(0 0 0 / 10%)",
+const StyledCloseButton = styled(CloseButton)({
+  position:'absolute',
+  top:10,
+  right:10
+});
+
+const StyledContainer = styled(Container)({
   position: "relative",
-  padding: "50px 20px 40px 20px",
-  background: 'white',
   width: "fit-content",
   height: "fit-content",
-    outline:'unset',
-  border:'unset',
-  borderRadius: 10,
-  ".popup-title": {
-    fontSize: 18,
-    fontWeight: 600,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-}));
+  outline: "unset",
+  padding: 20,
+  paddingTop: 50,
+});
+
 
 const StyledModal = styled(Modal)({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   padding: 20,
-  outline:'unset',
-  border:'unset'
+  outline: "unset",
+  border: "unset",
 });
-

@@ -6,8 +6,11 @@ import {
   useRestoreConnection,
 } from "connection";
 import { useEffect } from "react";
-import { StyledGrid } from "styles";
-import { Unfreeze } from "Unfreeze";
+import { StyledFlexColumn, StyledGrid } from "styles";
+import Info from "Info";
+import { Unfreeze } from "Unfreeze/Unfreeze";
+import { Footer } from "components";
+import { Box } from "@mui/system";
 
 function App() {
   const restoreConnection = useRestoreConnection();
@@ -20,17 +23,40 @@ function App() {
   }, []);
 
   return (
-    <div>
+    <StyledApp>
       <Navbar />
-      <StyledApp>
+      <StyledContent>
         <Unfreeze />
-      </StyledApp>
-    </div>
+        <Info />
+      </StyledContent>
+      <Footer />
+    </StyledApp>
   );
 }
 
 export default App;
 
-const StyledApp = styled(StyledGrid)({
+const StyledApp = styled(StyledFlexColumn)({
+  minHeight:'100vh',
+  gap: 0
+})
+
+const StyledContent = styled(StyledGrid)({
   paddingTop: 100,
+  display: "flex",
+  gap: 10,
+  flexDirection: "row",
+  alignItems: "flex-start",
+  paddingBottom: 100,
+  "@media (max-width: 900px)": {
+    flexDirection: "column",
+    ".unfreeze": {
+      width: "100%",
+      order: 2,
+    },
+    ".info": {
+      width: "100%",
+      order: 1,
+    },
+  },
 });

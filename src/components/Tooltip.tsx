@@ -5,22 +5,25 @@ import { Box } from "@mui/system";
 export function AppTooltip({
   children,
   text,
+  style ={},
 }: {
   children: React.ReactNode;
   text: React.ReactNode;
+  style?: React.CSSProperties;
 }) {
+  if(!text) return <>{children}</>;
   return (
-    <StyledTooltip
-      arrow={true}
-      followCursor={true}
-      title={<StyledTitle>{text}</StyledTitle>}
-    >
-      <Box className="tooltip-children">
+    <StyledTooltip arrow={true} title={<StyledTitle>{text}</StyledTitle>}>
+      <StyledContent style={style} className="tooltip-children">
         {children}
-      </Box>
+      </StyledContent>
     </StyledTooltip>
   );
 }
+
+
+const StyledContent = styled(Box)({
+});
 
 
 const StyledTitle = styled(Typography)({

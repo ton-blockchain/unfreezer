@@ -10,3 +10,6 @@ export * from "./CloseButton";
 export * from './Notification'
 export * from "./Github";
 export * from "./Tooltip";
+export * from "./Popup";
+export * from "./Footer";
+export * from "./NumberDisplay";

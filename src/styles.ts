@@ -66,11 +66,8 @@ export const textOverflow: CSSProperties = {
 
 export const StyledGrid = styled(StyledFlexColumn)({
   gap: 0,
-  width: "calc(100% - 100px)",
+  width: "calc(100% - 30px)",
   maxWidth: 950,
   marginLeft: "auto",
   marginRight: "auto",
-  "@media (max-width: 850px)": {
-    width: "calc(100% - 30px)",
-  },
 });

@@ -1,25 +1,31 @@
-# This is a basic workflow to help you get started with Actions
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Build and Deploy
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        node-version: [16.x, 17.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
-      - name: install dependencies
-        run: yarn install
-      - name: Build
-        run: export NODE_OPTIONS="--max-old-space-size=4096" && yarn build
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: dist # The folder the action should deploy.
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: mkdir bin && wget https://github.com/ton-defi-org/ton-binaries/releases/download/ubuntu-22-0.4.1/fift -P ./bin && chmod +x ./bin/fift && wget https://github.com/ton-defi-org/ton-binaries/releases/download/ubuntu-22-0.4.1/func -P ./bin && chmod +x ./bin/func && wget https://github.com/ton-defi-org/ton-binaries/releases/download/ubuntu-22-0.4.1/fiftlib.zip -P ./bin && unzip ./bin/fiftlib.zip -d ./bin/fiftlib
+      - run: npm ci
+      - run: npm run build
+      - run: npm test

@@ -2,9 +2,8 @@ import { Box, Fade, Skeleton, styled, Typography } from "@mui/material";
 import { StyledFlexColumn, StyledFlexRow } from "styles";
 import { Popup } from "./Popup";
 import { QRCodeSVG } from "qrcode.react";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { GrClose } from "react-icons/gr";
-import { walletAdapters } from "config";
 
 import {
   useOnWalletSelected,
@@ -75,23 +74,6 @@ export function WalletSelect({ open, close }: Props) {
                 >
                   <img src={wallet.imageUrl} />
                   <Typography className="wallet-name">{wallet.name}</Typography>
-                </StyledWallet>
-              );
-            })}
-            {walletAdapters?.map((wallet) => {
-              if (isMobile && wallet.mobileDisabled) return null;
-              return (
-                <StyledWallet
-                  justifyContent="flex-start"
-                  key={wallet.title}
-                  onClick={() => {
-                    selectWallet(wallet);
-                  }}
-                >
-                  <img src={wallet.icon} />
-                  <Typography className="wallet-name">
-                    {wallet.title}
-                  </Typography>
                 </StyledWallet>
               );
             })}

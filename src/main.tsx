@@ -9,6 +9,8 @@ import { theme } from "theme";
 import { globalStyles } from "styles";
 import { SnackbarProvider } from "notistack";
 import App from "App";
+import { analytics } from "analytics";
+analytics.init();
 
 const queryClient = new QueryClient({
   defaultOptions: {

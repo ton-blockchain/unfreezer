@@ -3,7 +3,7 @@ import { TonConnection } from "@ton-defi.org/ton-connection";
 import { manifestUrl } from "config";
 import TonConnect from "@tonconnect/sdk";
 
-import { ConnectionStore } from "./types";
+import { ConnectionStore } from "types";
 
 export const useConnectionStore = create<ConnectionStore>((set, get) => ({
   address: undefined,

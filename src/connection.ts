@@ -8,16 +8,11 @@ import {
 } from "@ton-defi.org/ton-connection";
 import { Address, Cell, CommentMessage, toNano } from "ton";
 import { isMobile } from "react-device-detect";
-import {
-  CONTRACT_ADDRESS,
-  LOCAL_STORAGE_PROVIDER,
-  TX_FEE,
-  walletAdapters,
-} from "config";
+import { CONTRACT_ADDRESS, LOCAL_STORAGE_PROVIDER, TX_FEE } from "config";
 import { WalletProvider, Provider } from "types";
 import TonConnect from "@tonconnect/sdk";
 import _ from "lodash";
-import { useConnectionStore } from "store/store";
+import { useConnectionStore } from "store";
 
 export const useWallets = () => {
   const connector = useConnectionStore().connectorTC;
@@ -25,8 +20,8 @@ export const useWallets = () => {
   return useQuery(
     [],
     async () => {
-      return  connector.getWallets();
-        },
+      return connector.getWallets();
+    },
     {
       staleTime: Infinity,
     }
@@ -34,20 +29,9 @@ export const useWallets = () => {
 };
 
 export const useRestoreConnection = () => {
-  const { selectWallet } = useOnWalletSelected();
   const connector = useConnectionStore().connectorTC;
 
-  return () => {
-     connector.restoreConnection();
-    const provider = localStorage.getItem(LOCAL_STORAGE_PROVIDER);
-    if (!provider) {
-      return null
-    }
-    const walletAdapter = walletAdapters.find((it) => it.type === provider);
-    if (walletAdapter) {      
-      selectWallet(walletAdapter);
-    }
-  };
+  return () => connector.restoreConnection();
 };
 
 export const useConnectionEvenSubscription = () => {
@@ -55,7 +39,7 @@ export const useConnectionEvenSubscription = () => {
   const connector = useConnectionStore().connectorTC;
 
   useEffect(() => {
-    connector.onStatusChange((walletInfo) => {      
+    connector.onStatusChange((walletInfo) => {
       const address = walletInfo?.account.address;
       const friendlyAddress = address
         ? Address.parse(address).toFriendly()
@@ -79,7 +63,6 @@ export const useEmbededWallet = () => {
     }
   };
 };
-
 
 export const useOnWalletSelected = () => {
   const [session, setSession] = useState("");

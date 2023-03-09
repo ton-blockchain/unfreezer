@@ -12,7 +12,7 @@ import { useState } from "react";
 import LogoImg from "assets/logo.svg";
 import { IoLogOutOutline } from "react-icons/io5";
 import { useResetConnection } from "connection";
-import { useConnectionStore } from "store/store";
+import { useConnectionStore } from "store";
 
 export function Navbar() {
   const mobile = useMediaQuery("(max-width:600px)");
@@ -22,7 +22,7 @@ export function Navbar() {
         <StyledFlexRow justifyContent="space-between" width="100%">
           <StyledLogo onClick={() => window.scrollTo(0, 0)}>
             <img src={LogoImg} />
-            <Typography></Typography>
+            <Typography>Unfreeze</Typography>
           </StyledLogo>
           <StyledFlexRow style={{ width: "fit-content" }}>
             <ConnectSection />

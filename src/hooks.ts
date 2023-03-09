@@ -7,8 +7,8 @@ import { useNotification } from "components";
 import { handleMobileLink, waitForSeqno } from "utils";
 import { TX_FEE, TX_SUBMIT_SUCCESS_TEXT } from "config";
 import { useState } from "react";
-import { AccountDetails, GetTxArgs } from "store/types";
-import { useConnectionStore } from "store/store";
+import { AccountDetails, GetTxArgs } from "types";
+import { useConnectionStore } from "store";
 
 export async function getClientV2() {
   const endpoint = await getHttpEndpoint();
@@ -16,6 +16,7 @@ export async function getClientV2() {
 }
 
 export async function getClientV4() {
+  // TODO clientV4 ton access dont work
   // const endpoint = await getHttpV4Endpoint();
   return new TonClient4({ endpoint: "https://mainnet-v4.tonhubapi.com" });
 }
@@ -156,55 +157,27 @@ export function useUnfreezeTxn(
   );
 }
 
-export const useGetTx = () => {
-  const {
-    connectorTC,
-    connection,
-    address: connectedWalletAddress,
-  } = useConnectionStore();
-
-  return async (args: GetTxArgs) => {
-    if (!connectedWalletAddress) return;
-    if (connectorTC.connected) {
-      handleMobileLink(connectorTC);
-
-      await connectorTC.sendTransaction({
-        validUntil: Date.now() + 3 * 60 * 1000,
-        messages: [
-          {
-            address: args.address,
-            amount: toNano(args.value).toString(),
-            stateInit: args.stateInit,
-          },
-        ],
-      });
-      args.onSuccess();
-    } else {
-      return connection?.requestTransaction(
-        {
-          to: Address.parse(args.address),
-          value: toNano(args.value),
-          stateInit: args.stateInit as any,
-        },
-        args.onSuccess
-      );
-    }
-  };
-};
-
 type UnfreezeArgs = {
   stateInit: string;
   address: string;
+  amount?: number;
 };
 
 export const useUnfreezeCallback = () => {
-  const { address: connectedWalletAddress } = useConnectionStore();
+  const { address: connectedWalletAddress, connectorTC } = useConnectionStore();
   const [txLoading, setTxLoading] = useState(false);
   const { showNotification } = useNotification();
-  const getTx = useGetTx();
 
   const query = useMutation(
     async (args: UnfreezeArgs) => {
+      if (!args.amount) {
+        showNotification({
+          variant: "error",
+          message: "Missing TON amount",
+        });
+        return;
+      }
+
       setTxLoading(true);
 
       const clientV2 = await getClientV2();
@@ -222,13 +195,19 @@ export const useUnfreezeCallback = () => {
           message: TX_SUBMIT_SUCCESS_TEXT,
         });
       };
+      handleMobileLink(connectorTC);
 
-      await getTx({
-        address: args.address,
-        value: TX_FEE,
-        stateInit: args.stateInit,
-        onSuccess,
+      await connectorTC.sendTransaction({
+        validUntil: Date.now() + 3 * 60 * 1000,
+        messages: [
+          {
+            address: args.address,
+            amount: toNano(args.amount).toString(),
+            stateInit: args.stateInit,
+          },
+        ],
       });
+      onSuccess();
     },
     {
       onError: (error: any) => {
