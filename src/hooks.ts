@@ -114,6 +114,7 @@ export function useUnfreezeTxn(
       const account = Address.parse(accountStr);
 
       const tc4 = await getClientV4();
+      let error
 
       const { account: accountDetails } = await tc4.getAccount(
         unfreezeBlock!,
@@ -121,7 +122,9 @@ export function useUnfreezeTxn(
       );
 
       if (accountDetails.state.type !== "active") {
-        throw new Error("Account isn't active at specified block");
+       return {
+         error: "Account isn't active at specified block",
+       };
       }
 
       const stateInit = new StateInit({
@@ -138,14 +141,13 @@ export function useUnfreezeTxn(
       const stateInitHash = c.hash().toString("base64");
 
       if (stateInitHashToMatch !== stateInitHash) {
-        throw new Error(
-          `Expecting state init hash ${stateInitHashToMatch}, got ${stateInitHash}`
-        );
+       error = `Expecting state init hash ${stateInitHashToMatch}, got ${stateInitHash}`;
       }
 
       return {
         stateInit: c.toBoc().toString("base64"),
         stateInitHash,
+        error
       };
     },
     {

@@ -47,16 +47,18 @@ export function Unfreeze() {
   const { address: connectedWalletAddress } = useConnectionStore();
   const unfreezeBlock = modifiedUnfreezeBlock || accountDetails?.unfreezeBlock;
 
-  const { data: unfreezeTxnData, isInitialLoading: unfreezeTxnDataLoading } =
-    useUnfreezeTxn(
-      address,
-      accountDetails?.stateInitHashToMatch,
-      unfreezeBlock
-    );
+  const {
+    data: unfreezeTxnData,
+    isInitialLoading: unfreezeTxnDataLoading,
+  } = useUnfreezeTxn(
+    address,
+    accountDetails?.stateInitHashToMatch,
+    unfreezeBlock
+  );
 
   const onSubmit = () => {
     unfreeze({
-      stateInit: unfreezeTxnData!.stateInit,
+      stateInit: unfreezeTxnData!.stateInit || '',
       address,
       amount,
     });
@@ -65,6 +67,7 @@ export function Unfreeze() {
   const onAddressChange = (value: string) => {
     setSearchParams(new URLSearchParams(`address=${value}`));
     setAddress(value);
+    setModifiedUnfreezeBlock(undefined);
   };
 
   return (
@@ -109,11 +112,12 @@ export function Unfreeze() {
             isLoading={accoundDetailsLoading}
             unfreezeBlock={unfreezeBlock}
             onSubmit={setModifiedUnfreezeBlock}
+            initialUnfreezeBlock={accountDetails?.unfreezeBlock}
           />
           <ExpectedStateInit
             isLoading={accoundDetailsLoading || unfreezeTxnDataLoading}
             stateInitHash={unfreezeTxnData?.stateInitHash}
-            stateInitHashToMatch={accountDetails?.stateInitHashToMatch}
+            error={unfreezeTxnData?.error}
           />
         </StyledFlexColumn>
         <ActionButton

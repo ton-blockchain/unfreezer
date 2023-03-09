@@ -23,36 +23,34 @@ import {
 
 export const ExpectedStateInit = ({
   isLoading,
-  stateInitHashToMatch,
+  error,
   stateInitHash,
 }: {
   isLoading: boolean;
-  stateInitHashToMatch?: string;
+  error?: string;
   stateInitHash?: string;
 }) => {
   const status = useMemo(() => {
-    if (!stateInitHash && !stateInitHashToMatch) {
-      return null;
-    }
-    if (stateInitHash === stateInitHashToMatch) {
-      return <BsFillCheckCircleFill color="green" size={22} />;
+    if (stateInitHash && !error) {
+      return (
+        <BsFillCheckCircleFill
+          color="green"
+          style={{ minWidth: 22, minHeight: 22 }}
+        />
+      );
     }
     return (
-      <AppTooltip
-        text={`State init hash does not match required hash ${stateInitHashToMatch}`}
-      >
-        <IoWarning color="red" size={22} />
+      <AppTooltip text={error}>
+        <IoWarning color="red" style={{ minWidth: 22, minHeight: 22 }} />
       </AppTooltip>
     );
-  }, [stateInitHash, stateInitHashToMatch]);
+  }, [stateInitHash, error]);
 
   return (
     <DetailRow isLoading={isLoading} title="State init hash at block:">
       <StyledFlexRow gap={10} justifyContent="flex-start">
-        <AppTooltip style={textOverflow} text={stateInitHashToMatch}>
-          <Typography style={textOverflow}>
-            {stateInitHashToMatch || "-"}
-          </Typography>
+        <AppTooltip style={textOverflow} text={stateInitHash}>
+          <Typography style={textOverflow}>{stateInitHash || "-"}</Typography>
         </AppTooltip>
         {status}
       </StyledFlexRow>
@@ -132,10 +130,12 @@ export const DetailRow = ({
 };
 
 export const UnfreezeBlock = ({
+  initialUnfreezeBlock,
   unfreezeBlock,
   onSubmit,
   isLoading,
 }: {
+  initialUnfreezeBlock?: number;
   unfreezeBlock?: number;
   onSubmit: (value: number) => void;
   isLoading: boolean;
@@ -150,8 +150,7 @@ export const UnfreezeBlock = ({
   }, [unfreezeBlock, open]);
 
   const validateAndSubmit = () => {
-    const isValid = value?.toString().length === 8;
-    console.log({ isValid });
+    const isValid = !!value;
 
     if (!isValid || !value) {
       setError(true);
@@ -195,6 +194,19 @@ export const UnfreezeBlock = ({
             Change
           </StyledChangeButton>
         )}
+        {initialUnfreezeBlock &&
+          unfreezeBlock &&
+          unfreezeBlock !== initialUnfreezeBlock && (
+            <StyledChangeButton
+              transparent={true}
+              onClick={() => {
+                onSubmit(initialUnfreezeBlock);
+                setShowUnfreeze(false);
+              }}
+            >
+              Reset
+            </StyledChangeButton>
+          )}
       </DetailRow>
     </>
   );

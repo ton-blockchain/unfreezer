@@ -6,11 +6,10 @@ import {
   TonhubProvider,
   TonWalletProvider,
 } from "@ton-defi.org/ton-connection";
-import { Address, Cell, CommentMessage, toNano } from "ton";
+import { Address  } from "ton";
 import { isMobile } from "react-device-detect";
-import { CONTRACT_ADDRESS, LOCAL_STORAGE_PROVIDER, TX_FEE } from "config";
+import { LOCAL_STORAGE_PROVIDER, TX_FEE } from "config";
 import { WalletProvider, Provider } from "types";
-import TonConnect from "@tonconnect/sdk";
 import _ from "lodash";
 import { useConnectionStore } from "store";
 
@@ -169,65 +168,3 @@ export const useResetConnection = () => {
   };
 };
 
-export const useGetTransaction = () => {
-  const { connectorTC, connection } = useConnectionStore();
-
-  return async (vote: string, onSuccess: () => void) => {
-    const cell = new Cell();
-    new CommentMessage(vote).writeTo(cell);
-
-    if (connectorTC.connected) {
-      handleMobileLink(connectorTC);
-
-      await connectorTC.sendTransaction({
-        validUntil: Date.now() + 5 * 60 * 1000,
-        messages: [
-          {
-            address: CONTRACT_ADDRESS.toFriendly(),
-            amount: toNano(TX_FEE).toString(),
-            stateInit: undefined,
-            payload: cell ? cell.toBoc().toString("base64") : undefined,
-          },
-        ],
-      });
-      onSuccess();
-      return;
-    }
-    if (!connection) return;
-
-    const isExtension =
-      (connection as any)._provider instanceof ChromeExtensionWalletProvider;
-
-    if (isMobile || isExtension) {
-      await connection?.requestTransaction({
-        to: CONTRACT_ADDRESS,
-        value: toNano(TX_FEE),
-        message: cell,
-      });
-      onSuccess();
-    } else {
-      return connection?.requestTransaction(
-        {
-          to: CONTRACT_ADDRESS,
-          value: toNano(TX_FEE),
-          message: cell,
-        },
-        onSuccess
-      );
-    }
-  };
-};
-
-const handleMobileLink = (connectorTC?: TonConnect) => {
-  if (!isMobile) return;
-  const Tonkeeper = connectorTC?.wallet?.device.appName;
-
-  switch (Tonkeeper) {
-    case "Tonkeeper":
-      (window as any).location = "https://app.tonkeeper.com";
-      break;
-
-    default:
-      break;
-  }
-};

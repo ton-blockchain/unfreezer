@@ -39,7 +39,7 @@ export const StyledContainer = styled(StyledFlexColumn)({
 });
 
 export const StyledUnfreezePopup = styled(Popup)({
-  ".children": {
+  ".content": {
     width: "100%",
     maxWidth: 450,
   },

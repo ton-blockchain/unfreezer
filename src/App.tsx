@@ -47,7 +47,7 @@ const StyledContent = styled(StyledGrid)({
   gap: 10,
   flexDirection: "row",
   alignItems: "flex-start",
-  paddingBottom: 100,
+  paddingBottom: 0,
   "@media (max-width: 900px)": {
     flexDirection: "column",
     ".unfreeze": {
