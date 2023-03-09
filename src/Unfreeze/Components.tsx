@@ -35,21 +35,19 @@ export const ExpectedStateInit = ({
       return null;
     }
     if (stateInitHash === stateInitHashToMatch) {
-      return (
-        <AppTooltip text="all good">
-          <BsFillCheckCircleFill color="green" size={22} />
-        </AppTooltip>
-      );
+      return <BsFillCheckCircleFill color="green" size={22} />;
     }
     return (
-      <AppTooltip text="some warning">
+      <AppTooltip
+        text={`State init hash does not match required hash ${stateInitHashToMatch}`}
+      >
         <IoWarning color="red" size={22} />
       </AppTooltip>
     );
   }, [stateInitHash, stateInitHashToMatch]);
 
   return (
-    <DetailRow isLoading={isLoading} title="State init at block:">
+    <DetailRow isLoading={isLoading} title="State init hash at block:">
       <StyledFlexRow gap={10} justifyContent="flex-start">
         <AppTooltip style={textOverflow} text={stateInitHashToMatch}>
           <Typography style={textOverflow}>

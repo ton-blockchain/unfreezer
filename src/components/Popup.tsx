@@ -1,6 +1,6 @@
 import Modal from "@mui/material/Modal";
 import { ReactElement } from "react";
-import { styled } from "@mui/material";
+import { Box, styled } from "@mui/material";
 import { CloseButton } from "./CloseButton";
 import { Container } from "./Container";
 interface Props {
@@ -20,29 +20,33 @@ export const Popup = ({
 }: Props) => {
   return (
     <StyledModal open={open} onClose={close} className={className}>
-      <StyledContainer className="children" title={title}>
-        {close && <StyledCloseButton close={close} />}
-        {children}
-      </StyledContainer>
+      <StyledModalChildren className="content">
+        <StyledContainer title={title} className="children">
+          {close && <StyledCloseButton close={close} />}
+          {children}
+        </StyledContainer>
+      </StyledModalChildren>
     </StyledModal>
   );
 };
 
 const StyledCloseButton = styled(CloseButton)({
-  position:'absolute',
-  top:10,
-  right:10
+  position: "absolute",
+  top: 10,
+  right: 10,
+});
+const StyledModalChildren = styled(Box)({
+  width: "fit-content",
+  height: "fit-content",
 });
 
 const StyledContainer = styled(Container)({
   position: "relative",
-  width: "fit-content",
-  height: "fit-content",
+
   outline: "unset",
   padding: 20,
   paddingTop: 50,
 });
-
 
 const StyledModal = styled(Modal)({
   display: "flex",

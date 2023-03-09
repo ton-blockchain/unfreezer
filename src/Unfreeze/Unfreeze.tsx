@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { Container } from "components";
-import { StyledFlexColumn, textOverflow } from "styles";
+import { StyledFlexColumn } from "styles";
 import { useAccountDetails, useUnfreezeCallback, useUnfreezeTxn } from "hooks";
 import { Exmaple } from "../components/Exampe";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   StyledContainer,
   StyledContractAddressInput,
@@ -19,6 +18,8 @@ import {
   LatestStateInit,
   Balance,
 } from "./Components";
+import { useConnectionStore } from "store";
+import { useSearchParams } from "react-router-dom";
 /*
 TODOs => 
 - ton connect manifest => https://ton-community.github.io/unfreezer/, TON Unfreezer
@@ -32,7 +33,8 @@ TODOs =>
 */
 
 export function Unfreeze() {
-  const [address, setAddress] = useState("");
+  let [searchParams, setSearchParams] = useSearchParams();
+  const [address, setAddress] = useState(searchParams.get("address") || "");
   const [amount, setAmount] = useState<number | undefined>(0.1);
   const [modifiedUnfreezeBlock, setModifiedUnfreezeBlock] = useState<
     number | undefined
@@ -42,6 +44,7 @@ export function Unfreeze() {
     useAccountDetails(address);
 
   const { mutate: unfreeze, isLoading: txLoading } = useUnfreezeCallback();
+  const { address: connectedWalletAddress } = useConnectionStore();
   const unfreezeBlock = modifiedUnfreezeBlock || accountDetails?.unfreezeBlock;
 
   const { data: unfreezeTxnData, isInitialLoading: unfreezeTxnDataLoading } =
@@ -51,15 +54,28 @@ export function Unfreeze() {
       unfreezeBlock
     );
 
+  const onSubmit = () => {
+    unfreeze({
+      stateInit: unfreezeTxnData!.stateInit,
+      address,
+      amount,
+    });
+  };
+
+  const onAddressChange = (value: string) => {
+    setSearchParams(new URLSearchParams(`address=${value}`));
+    setAddress(value);
+  };
+
   return (
     <StyledContainer className="unfreeze">
       <Container title="Account To Unfreeze">
-        <Exmaple onClick={setAddress} />
+        <Exmaple onClick={onAddressChange} />
         <StyledContractAddressInput
           title="Contract Address"
           placeholder="Enter Address"
           value={address}
-          onChange={setAddress}
+          onChange={onAddressChange}
         />
         <StyledFlexColumn gap={15}>
           <DetailRow isLoading={accoundDetailsLoading} title="Workchain:">
@@ -80,7 +96,7 @@ export function Unfreeze() {
       </Container>
 
       <StyledUnfreezeDetails
-        disabled={!accountDetails?.isFrozen}
+        disabled={!accountDetails?.isFrozen && !!connectedWalletAddress}
         title="Unfreeze Details"
       >
         <StyledFlexColumn gap={15}>
@@ -102,13 +118,7 @@ export function Unfreeze() {
         </StyledFlexColumn>
         <ActionButton
           disabled={!unfreezeTxnData?.stateInitHash}
-          onSubmit={() =>
-            unfreeze({
-              stateInit: unfreezeTxnData!.stateInit,
-              address,
-              amount,
-            })
-          }
+          onSubmit={onSubmit}
           loading={txLoading}
         />
       </StyledUnfreezeDetails>

@@ -10,6 +10,7 @@ import { globalStyles } from "styles";
 import { SnackbarProvider } from "notistack";
 import App from "App";
 import { analytics } from "analytics";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 analytics.init();
 
 const queryClient = new QueryClient({
@@ -21,6 +22,13 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <QueryClientProvider client={queryClient}>
@@ -34,7 +42,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           variantError: "snackbar-error",
         }}
       >
-        <App />
+        <RouterProvider router={router} />
       </SnackbarProvider>
     </ThemeProvider>
 

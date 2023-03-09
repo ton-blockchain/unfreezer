@@ -32,7 +32,6 @@ export function WalletSelect({ open, close }: Props) {
   const tonConnectWallets = useTonConnectWallets();
   
   const {
-    selectWallet,
     selectWalletTC,
     session,
     reset: resetSession,

@@ -179,6 +179,10 @@ export const useUnfreezeCallback = () => {
       }
 
       setTxLoading(true);
+       showNotification({
+         variant: "info",
+         message: "Check your wallet for a pending transaction",
+       });
 
       const clientV2 = await getClientV2();
       const waiter = await waitForSeqno(
