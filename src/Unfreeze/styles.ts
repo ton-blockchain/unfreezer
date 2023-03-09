@@ -20,7 +20,7 @@ export const StyledDetailsValue = styled(Box)({
 
 export const StyledContractAddressInput = styled(TextInput)({
   maxWidth: 600,
-  marginBottom: 30,
+  marginBottom: 20,
 });
 
 export const StyledDetailRow = styled(StyledFlexRow)({

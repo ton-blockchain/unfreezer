@@ -78,7 +78,7 @@ const StyledInput = styled("input")(({ theme }) => ({
   outline: "unset",
   fontSize: 16,
   fontFamily: "inherit",
-  border: `2px solid rgba(114, 138, 150, 0.4)`,
+  border: `1px solid rgba(114, 138, 150, 0.4)`,
   color: theme.palette.text.primary,
   textIndent:12,
   "&::placeholder": {
