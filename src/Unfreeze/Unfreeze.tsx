@@ -72,7 +72,7 @@ export function Unfreeze() {
 
   return (
     <StyledContainer className="unfreeze">
-      <Container title="Account To Unfreeze">
+      <Container title="Contract To Unfreeze">
         <Exmaple onClick={onAddressChange} />
         <StyledContractAddressInput
           title="Contract Address"
