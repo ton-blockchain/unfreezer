@@ -1,13 +1,12 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Address, TonClient, TonClient4, fromNano, Cell, toNano } from "ton";
-import { getHttpEndpoint, getHttpV4Endpoint } from "@orbs-network/ton-access";
-import BN from "bn.js";
-import { StateInit, beginCell } from "ton";
+import { getHttpEndpoint } from "@orbs-network/ton-access";
+import { StateInit } from "ton";
 import { useNotification } from "components";
 import { handleMobileLink, waitForSeqno } from "utils";
-import { TX_FEE, TX_SUBMIT_SUCCESS_TEXT } from "config";
+import { TX_SUBMIT_SUCCESS_TEXT } from "config";
 import { useState } from "react";
-import { AccountDetails, GetTxArgs } from "types";
+import { AccountDetails } from "types";
 import { useConnectionStore } from "store";
 
 export async function getClientV2() {
@@ -167,6 +166,7 @@ export const useUnfreezeCallback = () => {
   const { address: connectedWalletAddress, connectorTC } = useConnectionStore();
   const [txLoading, setTxLoading] = useState(false);
   const { showNotification } = useNotification();
+  const queryClient = useQueryClient();
 
   const query = useMutation(
     async (args: UnfreezeArgs) => {
@@ -194,6 +194,8 @@ export const useUnfreezeCallback = () => {
           variant: "success",
           message: TX_SUBMIT_SUCCESS_TEXT,
         });
+
+        queryClient.invalidateQueries(["account_details"]);
       };
       handleMobileLink(connectorTC);
 

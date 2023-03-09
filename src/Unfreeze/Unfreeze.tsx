@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { Container } from "components";
 import { StyledFlexColumn, textOverflow } from "styles";
 import { useAccountDetails, useUnfreezeCallback, useUnfreezeTxn } from "hooks";
 import { Exmaple } from "../components/Exampe";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   StyledContainer,
   StyledContractAddressInput,
@@ -37,7 +38,7 @@ export function Unfreeze() {
     number | undefined
   >();
 
-  const { data: accountDetails, isInitialLoading: accoundDetailsLoading } =
+  const { data: accountDetails, isFetching: accoundDetailsLoading } =
     useAccountDetails(address);
 
   const { mutate: unfreeze, isLoading: txLoading } = useUnfreezeCallback();
@@ -49,7 +50,6 @@ export function Unfreeze() {
       accountDetails?.stateInitHashToMatch,
       unfreezeBlock
     );
-
 
   return (
     <StyledContainer className="unfreeze">
@@ -112,9 +112,6 @@ export function Unfreeze() {
           loading={txLoading}
         />
       </StyledUnfreezeDetails>
-
-      {/* TODO send the internal message via TC2 */}
-      {/* Once we do, we can just invalidate the query in useAccountDetails until state of contract becomes active */}
     </StyledContainer>
   );
 }
