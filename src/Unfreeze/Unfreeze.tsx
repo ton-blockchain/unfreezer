@@ -97,9 +97,14 @@ export function Unfreeze() {
         <StyledFlexColumn gap={15}>
           <AmountToSend
             isLoading={accoundDetailsLoading}
-            value={amount}
+            value={parseFloat(accountDetails?.minAmountToSend ?? "0")}
             onChange={setAmount}
           />
+          {/* <AmountToSend
+            isLoading={accoundDetailsLoading}
+            value={parseFloat(accountDetails?.pricePerMonth ?? "0")}
+            onChange={setAmount}
+          /> */}
           <UnfreezeBlock
             isLoading={accoundDetailsLoading}
             unfreezeBlock={unfreezeBlock}

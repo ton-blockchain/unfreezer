@@ -1,5 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Address, TonClient, TonClient4, fromNano, Cell, toNano } from "ton";
+import {
+  Address,
+  TonClient,
+  TonClient4,
+  fromNano,
+  Cell,
+  toNano,
+  Slice,
+} from "ton";
 import { getHttpEndpoint } from "@orbs-network/ton-access";
 import { StateInit } from "ton";
 import { useNotification } from "components";
@@ -8,6 +16,7 @@ import { TX_SUBMIT_SUCCESS_TEXT } from "config";
 import { useState } from "react";
 import { AccountDetails } from "types";
 import { useConnectionStore } from "store";
+import BN from "bn.js";
 
 export async function getClientV2() {
   const endpoint = await getHttpEndpoint();
@@ -20,7 +29,50 @@ export async function getClientV4() {
   return new TonClient4({ endpoint: "https://mainnet-v4.tonhubapi.com" });
 }
 
-function calculateAmountToSend() {
+type StorageFees = {
+  utime_since: number;
+  bit_price_ps: number;
+  cell_price_ps: number;
+  mc_bit_price_ps: number;
+  mc_cell_price_ps: number;
+};
+
+function configParse18(slice: Slice | null | undefined): StorageFees {
+  console.log(slice);
+  if (!slice) {
+    throw Error("Invalid config");
+  }
+
+  const result = slice.readDict(32, (slice) => {
+    let header = slice.readUintNumber(8);
+    if (header !== 0xcc) {
+      throw Error("Invalid config");
+    }
+    let utime_since = slice.readUint(32).toNumber();
+    let bit_price_ps = slice.readUint(64).toNumber();
+    let cell_price_ps = slice.readUint(64).toNumber();
+    let mc_bit_price_ps = slice.readUint(64).toNumber();
+    let mc_cell_price_ps = slice.readUint(64).toNumber();
+    return {
+      utime_since,
+      bit_price_ps,
+      cell_price_ps,
+      mc_bit_price_ps,
+      mc_cell_price_ps,
+    };
+  });
+
+  return result.get("0")!;
+}
+
+async function calculateAmountToSend(
+  tc4: TonClient4,
+  lastSeqno: number,
+  frozenAccountDetails: AccountDetails,
+  activeAccountDetails: AccountDetails,
+  workchain: number,
+  lastPaid: number
+) {
   //   First one is "required storage fee", it should be calculated as
   // (now - last_paid) * (cells * cell_price_ps + bits * bit_price_ps) / 65536 + due_payment
   // last_paid, cells, bits and due_payment should be retrived from account  storage_stat
@@ -28,6 +80,51 @@ function calculateAmountToSend() {
   // This fee should not be editable.
   // Second one is "optional storage fee", it should be editable and it is fee for "future storage payments". It can be arbitrary, we just need to show for how much time this fee will be enough. Note, that when calculating "future storage payments" we need number of cells and bits in init_state (not in frozen state).
   // Regarding "optional storage fee", for it to be used, usually we need to send tons in non-bouncable message (otherwise many unfrozen contracts will bounce empty message and final balance will be 0).
+  const now = Date.now() / 1000;
+  const timeDelta = now - lastPaid;
+
+  const config18Raw = await tc4.getConfig(lastSeqno, [18]);
+
+  const config18 = configParse18(
+    Cell.fromBoc(Buffer.from(config18Raw.config.cell, "base64"))[0].beginParse()
+  );
+
+  const cell_price_ps =
+    workchain === -1 ? config18.mc_cell_price_ps : config18.cell_price_ps;
+  const bit_price_ps =
+    workchain === -1 ? config18.mc_bit_price_ps : config18.bit_price_ps;
+
+  function priceForDelta(timeDeltaSec: number, accountDetails: AccountDetails) {
+    console.log(accountDetails.storageStat?.used, "Shahar");
+    console.log(
+      timeDeltaSec,
+      accountDetails.storageStat!.used.cells,
+      cell_price_ps,
+      accountDetails.storageStat!.used.bits,
+      bit_price_ps,
+      (timeDeltaSec *
+        (accountDetails.storageStat!.used.cells * cell_price_ps +
+          accountDetails.storageStat!.used.bits * bit_price_ps)) /
+        2 ** 16
+    );
+    return new BN(
+      (timeDeltaSec *
+        (accountDetails.storageStat!.used.cells * cell_price_ps +
+          accountDetails.storageStat!.used.bits * bit_price_ps)) /
+        2 ** 16
+    );
+  }
+
+  const MONTH_SEC = 24 * 3600 * 30;
+
+  return {
+    minAmountToSend: fromNano(
+      priceForDelta(timeDelta, frozenAccountDetails).add(
+        new BN(frozenAccountDetails.storageStat!.duePayment ?? 0)
+      )
+    ),
+    pricePerMonth: fromNano(priceForDelta(MONTH_SEC, activeAccountDetails)),
+  };
 }
 
 async function findUnfreezeBlock(
@@ -35,20 +132,27 @@ async function findUnfreezeBlock(
   lastKnownAccountDetails: AccountDetails,
   account: Address,
   safetyNumber: number = 0
-): Promise<number> {
+): Promise<{
+  unfreezeBlock: number;
+  lastPaid: number;
+  activeAccountDetails: AccountDetails;
+}> {
   if (safetyNumber === 30) {
     throw new Error(
       "Reached 30 iterations searching for active seqno. Aborting."
     );
   }
 
+  // Shards from all chains at timestamp
   const { shards: shardLastPaid } = await tc4.getBlockByUtime(
     lastKnownAccountDetails.storageStat!.lastPaid
   );
 
-  const nextSeqno =
-    shardLastPaid.find((s) => s.workchain === account.workChain)!.seqno - 1;
+  // Get masterchain seqno (which we need to query v4)
+  const nextSeqno = shardLastPaid.find((s) => s.workchain === -1)!.seqno - 1;
 
+  // From this -> https://github.com/ton-community/ton-api-v4/blob/main/src/api/handlers/handleAccountGetLite.ts#L21
+  // we understand that v4 is always to be queried by a masterchain seqno
   const { account: accountDetails } = await tc4.getAccount(nextSeqno, account);
 
   if (accountDetails.state.type === "frozen") {
@@ -61,7 +165,11 @@ async function findUnfreezeBlock(
     );
   }
 
-  return nextSeqno;
+  return {
+    unfreezeBlock: nextSeqno,
+    lastPaid: lastKnownAccountDetails.storageStat!.lastPaid, // Last paid is retrieved from the *least recent* frozen state
+    activeAccountDetails: accountDetails,
+  };
 }
 
 export function useAccountDetails(accountStr: string) {
@@ -73,39 +181,48 @@ export function useAccountDetails(accountStr: string) {
 
       const tc4 = await getClientV4();
 
-      // TODO seqno per chain? (masterchain vs basic workchain)
-      const {
+      let {
         last: { seqno },
       } = await tc4.getLastBlock();
 
-      const { account: accountDetails } = await tc4.getAccountLite(
+      seqno -= 2000;
+
+      const { account: frozenAccountDetails } = await tc4.getAccountLite(
         seqno,
         account
       );
 
-      const balance = fromNano(accountDetails.balance.coins);
+      const balance = fromNano(frozenAccountDetails.balance.coins);
 
-      if (accountDetails.state.type !== "frozen") {
+      if (frozenAccountDetails.state.type !== "frozen") {
         return {
-          accountState: accountDetails.state.type,
+          accountState: frozenAccountDetails.state.type,
           isFrozen: false,
           balance,
         };
       }
 
-      const unfreezeBlock = await findUnfreezeBlock(
+      const { unfreezeBlock, lastPaid, activeAccountDetails } =
+        await findUnfreezeBlock(tc4, frozenAccountDetails, account);
+
+      const { minAmountToSend, pricePerMonth } = await calculateAmountToSend(
         tc4,
-        accountDetails,
-        account
+        seqno,
+        frozenAccountDetails,
+        activeAccountDetails,
+        account.workChain,
+        lastPaid
       );
 
       return {
-        accountState: accountDetails.state.type,
+        accountState: frozenAccountDetails.state.type,
         isFrozen: true,
         unfreezeBlock,
         balance,
-        stateInitHashToMatch: accountDetails.state.stateHash,
+        stateInitHashToMatch: frozenAccountDetails.state.stateHash,
         workchain: account.workChain,
+        minAmountToSend,
+        pricePerMonth,
       };
     },
     {
