@@ -20,6 +20,7 @@ import {
 } from "./Components";
 import { useConnectionStore } from "store";
 import { useSearchParams } from "react-router-dom";
+import { Address } from "ton";
 /*
 TODOs => 
 - ton connect manifest => https://ton-community.github.io/unfreezer/, TON Unfreezer
@@ -65,8 +66,9 @@ export function Unfreeze() {
   };
 
   const onAddressChange = (value: string) => {
-    setSearchParams(new URLSearchParams(`address=${value}`));
-    setAddress(value);
+    const parsed = Address.parse(value).toFriendly();
+    setSearchParams(new URLSearchParams(`address=${parsed}`));
+    setAddress(parsed);
     setModifiedUnfreezeBlock(undefined);
   };
 
