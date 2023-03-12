@@ -48,27 +48,24 @@ export function Unfreeze() {
   const { address: connectedWalletAddress } = useConnectionStore();
   const unfreezeBlock = modifiedUnfreezeBlock || accountDetails?.unfreezeBlock;
 
-  const {
-    data: unfreezeTxnData,
-    isInitialLoading: unfreezeTxnDataLoading,
-  } = useUnfreezeTxn(
-    address,
-    accountDetails?.stateInitHashToMatch,
-    unfreezeBlock
-  );
+  const { data: unfreezeTxnData, isInitialLoading: unfreezeTxnDataLoading } =
+    useUnfreezeTxn(
+      address,
+      accountDetails?.stateInitHashToMatch,
+      unfreezeBlock
+    );
 
   const onSubmit = () => {
     unfreeze({
-      stateInit: unfreezeTxnData!.stateInit || '',
+      stateInit: unfreezeTxnData!.stateInit || "",
       address,
       amount,
     });
   };
 
   const onAddressChange = (value: string) => {
-    const parsed = Address.parse(value).toFriendly();
-    setSearchParams(new URLSearchParams(`address=${parsed}`));
-    setAddress(parsed);
+    setSearchParams(new URLSearchParams(`address=${value}`));
+    setAddress(value);
     setModifiedUnfreezeBlock(undefined);
   };
 
@@ -83,9 +80,6 @@ export function Unfreeze() {
           onChange={onAddressChange}
         />
         <StyledFlexColumn gap={15}>
-          <DetailRow isLoading={accoundDetailsLoading} title="Workchain:">
-            <Typography> {accountDetails?.workchain || "-"}</Typography>
-          </DetailRow>
           <Balance
             isLoading={accoundDetailsLoading}
             balance={accountDetails?.balance}
@@ -93,10 +87,6 @@ export function Unfreeze() {
           <DetailRow isLoading={accoundDetailsLoading} title="Status:">
             <Typography>{accountDetails?.accountState || "-"}</Typography>
           </DetailRow>
-          <LatestStateInit
-            isLoading={accoundDetailsLoading}
-            stateInitHashToMatch={accountDetails?.stateInitHashToMatch}
-          />
         </StyledFlexColumn>
       </Container>
 
