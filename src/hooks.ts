@@ -20,11 +20,28 @@ export async function getClientV4() {
   return new TonClient4({ endpoint: "https://mainnet-v4.tonhubapi.com" });
 }
 
+function calculateAmountToSend() {
+  //   First one is "required storage fee", it should be calculated as
+  // (now - last_paid) * (cells * cell_price_ps + bits * bit_price_ps) / 65536 + due_payment
+  // last_paid, cells, bits and due_payment should be retrived from account  storage_stat
+  // cell_price_ps and bit_price_ps should be from ConfigParam18 (for masterchain mc_bit_price_ps and mc_cell_price_ps).
+  // This fee should not be editable.
+  // Second one is "optional storage fee", it should be editable and it is fee for "future storage payments". It can be arbitrary, we just need to show for how much time this fee will be enough. Note, that when calculating "future storage payments" we need number of cells and bits in init_state (not in frozen state).
+  // Regarding "optional storage fee", for it to be used, usually we need to send tons in non-bouncable message (otherwise many unfrozen contracts will bounce empty message and final balance will be 0).
+}
+
 async function findUnfreezeBlock(
   tc4: TonClient4,
   lastKnownAccountDetails: AccountDetails,
-  account: Address
+  account: Address,
+  safetyNumber: number = 0
 ): Promise<number> {
+  if (safetyNumber === 30) {
+    throw new Error(
+      "Reached 30 iterations searching for active seqno. Aborting."
+    );
+  }
+
   const { shards: shardLastPaid } = await tc4.getBlockByUtime(
     lastKnownAccountDetails.storageStat!.lastPaid
   );
@@ -35,7 +52,7 @@ async function findUnfreezeBlock(
   const { account: accountDetails } = await tc4.getAccount(nextSeqno, account);
 
   if (accountDetails.state.type === "frozen") {
-    return findUnfreezeBlock(tc4, accountDetails, account);
+    return findUnfreezeBlock(tc4, accountDetails, account, safetyNumber + 1);
   } else if (accountDetails.state.type === "uninit") {
     throw new Error(
       "Reached uninint block at seqno: " +
@@ -114,7 +131,7 @@ export function useUnfreezeTxn(
       const account = Address.parse(accountStr);
 
       const tc4 = await getClientV4();
-      let error
+      let error;
 
       const { account: accountDetails } = await tc4.getAccount(
         unfreezeBlock!,
@@ -122,9 +139,9 @@ export function useUnfreezeTxn(
       );
 
       if (accountDetails.state.type !== "active") {
-       return {
-         error: "Account isn't active at specified block",
-       };
+        return {
+          error: "Account isn't active at specified block",
+        };
       }
 
       const stateInit = new StateInit({
@@ -141,13 +158,13 @@ export function useUnfreezeTxn(
       const stateInitHash = c.hash().toString("base64");
 
       if (stateInitHashToMatch !== stateInitHash) {
-       error = `Expecting state init hash ${stateInitHashToMatch}, got ${stateInitHash}`;
+        error = `Expecting state init hash ${stateInitHashToMatch}, got ${stateInitHash}`;
       }
 
       return {
         stateInit: c.toBoc().toString("base64"),
         stateInitHash,
-        error
+        error,
       };
     },
     {
@@ -181,10 +198,10 @@ export const useUnfreezeCallback = () => {
       }
 
       setTxLoading(true);
-       showNotification({
-         variant: "info",
-         message: "Check your wallet for a pending transaction",
-       });
+      showNotification({
+        variant: "info",
+        message: "Check your wallet for a pending transaction",
+      });
 
       const clientV2 = await getClientV2();
       const waiter = await waitForSeqno(
