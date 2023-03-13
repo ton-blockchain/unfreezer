@@ -1,4 +1,4 @@
-export * from './Container'
+export * from "./Container";
 export * from "./Button";
 export * from "./Link";
 export * from "./Progress";
@@ -6,7 +6,7 @@ export * from "./ConnectButton";
 export * from "./Input";
 export * from "./ConnectButton";
 export * from "./CloseButton";
-export * from './Notification'
+export * from "./Notification";
 export * from "./Github";
 export * from "./Tooltip";
 export * from "./Popup";

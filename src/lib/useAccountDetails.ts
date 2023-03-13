@@ -62,7 +62,12 @@ export function useAccountDetails(
         try {
           // Fetch the block number to unfreeze from
           ({ unfreezeBlock, lastPaid, activeAccountDetails } =
-            await findUnfreezeBlock(tc4, frozenAccountDetails, account, blockToReviveFrom));
+            await findUnfreezeBlock(
+              tc4,
+              frozenAccountDetails,
+              account,
+              blockToReviveFrom
+            ));
         } catch (e: any) {
           console.warn("Unable to find unfreeze block: " + e.toString());
         }

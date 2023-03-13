@@ -37,7 +37,13 @@ export async function findUnfreezeBlock(
   const { account: accountDetails } = await tc4.getAccount(nextSeqno, account);
 
   if (accountDetails.state.type === "frozen") {
-    return findUnfreezeBlock(tc4, accountDetails, account, overrideBlock, safetyNumber + 1);
+    return findUnfreezeBlock(
+      tc4,
+      accountDetails,
+      account,
+      overrideBlock,
+      safetyNumber + 1
+    );
   } else if (accountDetails.state.type === "uninit") {
     throw new Error(
       "Reached uninint block at seqno: " +

@@ -37,9 +37,9 @@ function App() {
 export default App;
 
 const StyledApp = styled(StyledFlexColumn)({
-  minHeight:'100vh',
-  gap: 0
-})
+  minHeight: "100vh",
+  gap: 0,
+});
 
 const StyledContent = styled(StyledGrid)({
   paddingTop: 100,

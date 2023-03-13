@@ -1,10 +1,14 @@
-import React, { useState } from 'react'
-import { Button } from './Button';
-import { WalletSelect } from './WalletSelect';
+import React, { useState } from "react";
+import { Button } from "./Button";
+import { WalletSelect } from "./WalletSelect";
 
-
-
-export function ConnectButton({ text, className = "" }: { text?: string; className?: string }) {
+export function ConnectButton({
+  text,
+  className = "",
+}: {
+  text?: string;
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -15,4 +19,3 @@ export function ConnectButton({ text, className = "" }: { text?: string; classNa
     </>
   );
 }
-

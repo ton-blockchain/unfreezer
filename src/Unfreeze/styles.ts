@@ -47,20 +47,18 @@ export const StyledUnfreezePopup = styled(Popup)({
 
 export const StyledAmountInput = styled(NumberInput)({
   maxWidth: 120,
-  height:32,
+  height: 32,
   input: {
     textAlign: "center",
     textIndent: "0px",
   },
 });
 
-
 export const StyledChangeButton = styled(Button)({
   "*": {
     fontSize: 14,
   },
 });
-
 
 export const StyledUnfreezeDetails = styled(Container)<{ disabled: boolean }>(
   ({ disabled }) => ({

@@ -4,7 +4,6 @@ import { StateInit } from "ton";
 import { useNotification } from "../components";
 import { getClientV4 } from "./getClientV4";
 
-
 export function useUnfreezeTxn(
   accountStr: string,
   stateInitHashToMatch?: string,
@@ -55,7 +54,8 @@ export function useUnfreezeTxn(
       };
     },
     {
-      onError: (error: any) => showNotification({ variant: "error", message: error.toString() }),
+      onError: (error: any) =>
+        showNotification({ variant: "error", message: error.toString() }),
       enabled: !!unfreezeBlock && !!stateInitHashToMatch && !!accountStr,
     }
   );
