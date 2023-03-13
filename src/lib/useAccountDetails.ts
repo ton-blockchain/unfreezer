@@ -9,11 +9,11 @@ import { getClientV4 } from "./getClientV4";
 
 export function useAccountDetails(
   accountStr: string,
-  blockToReviveFrom?: number
+  overrideBlockToReviveFrom?: number
 ) {
   const { showNotification } = useNotification();
   const query = useQuery(
-    ["account_details", accountStr, blockToReviveFrom],
+    ["account_details", accountStr, overrideBlockToReviveFrom],
     async () => {
       const account = Address.parse(accountStr);
 
@@ -66,7 +66,7 @@ export function useAccountDetails(
               tc4,
               frozenAccountDetails,
               account,
-              blockToReviveFrom
+              overrideBlockToReviveFrom
             ));
         } catch (e: any) {
           console.warn("Unable to find unfreeze block: " + e.toString());
