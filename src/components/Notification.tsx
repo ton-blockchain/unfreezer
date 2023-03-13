@@ -58,7 +58,6 @@ export function useNotification() {
   };
 }
 
-
 const StyledCloseButton = styled(IconButton)({
   svg: {
     stroke: "white",

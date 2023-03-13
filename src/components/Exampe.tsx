@@ -1,7 +1,7 @@
 import { Chip, styled, Typography } from "@mui/material";
 import { isDev } from "config";
 import React from "react";
-import { StyledFlexColumn, StyledFlexRow } from "styles";
+import { StyledFlexColumn, StyledFlexRow } from "../styles";
 
 export const Exmaple = ({ onClick }: { onClick: (value: string) => void }) => {
   if (!isDev()) return null;

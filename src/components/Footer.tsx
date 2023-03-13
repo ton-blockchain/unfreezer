@@ -1,9 +1,9 @@
-import { styled, Typography } from '@mui/material'
-import React from 'react'
-import { StyledFlexColumn, StyledFlexRow } from 'styles'
-import OrbsLogo from 'assets/orbs.svg'
+import { styled, Typography } from "@mui/material";
+import React from "react";
+import { StyledFlexColumn, StyledFlexRow } from "styles";
+import OrbsLogo from "assets/orbs.svg";
 import HearLogo from "assets/heart.svg";
-import { Github } from 'components';
+import { Github } from "components";
 
 export function Footer() {
   return (
@@ -21,16 +21,15 @@ export function Footer() {
   );
 }
 
-
 const StyledContainer = styled(StyledFlexColumn)(({ theme }) => ({
-    marginTop:'auto',
-    height: 130,
+  marginTop: "auto",
+  height: 130,
   a: {
     textDecoration: "unset",
     color: theme.palette.primary.main,
-    display:'flex',
-    alignItems:'center',
-    gap: 5
+    display: "flex",
+    alignItems: "center",
+    gap: 5,
   },
   "*": {
     fontWeight: 500,
@@ -42,5 +41,5 @@ const StyledContainer = styled(StyledFlexColumn)(({ theme }) => ({
 }));
 
 const StyledWithLove = styled(StyledFlexRow)({
-   gap:4
-})
+  gap: 4,
+});

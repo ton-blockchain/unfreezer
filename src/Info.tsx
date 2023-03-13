@@ -1,26 +1,41 @@
 import { Link, styled, Typography } from "@mui/material";
 import { Container } from "components";
 import React from "react";
-import { StyledFlexColumn } from "styles";
+import { StyledFlexColumn } from "./styles";
 
 function Info() {
   return (
     <StyledContainer title="What is TON Unfreezer" className="info">
       <StyledFlexColumn alignItems="flex-start">
-        <Typography>Unfreeze a TON contract that ran out of gas for rent.</Typography>
         <Typography>
-          In order to unfreeze a contract, a StateInit message with its latest code + data cells needs to be sent to it.
+          Smart contracts in TON need to pay rent for the storage space they
+          occupy.
         </Typography>
+        <Typography>
+          When a smart contract has no funds to pay for storage fee for a long
+          time, it freezes and its storage becomes minimized.
+        </Typography>
+        <Typography>
+          In order to revive a frozen smart contract, you need to provide its
+          latest-known storage state back first.
+        </Typography>
+        <Typography>
+          This tool helps to unfreeze accounts by automatically detecting
+          relevant state, composing and sending the corresponding message to the
+          contract.
+        </Typography>
+        <Typography>To use it:</Typography>
         <Typography>1. Enter the address of the frozen contract</Typography>
         <Typography>
-          2. The tool will try to detect the block seqno to restore from. You can also override the seqno.
+          2. Specify the number of months you want to top up the contract with
+          rent
         </Typography>
         <Typography>
-          3. Specify a small amount of TON coins to send to the contract in order to revive it.
+          3. Connect your wallet and send the transaction.
         </Typography>
-        <Typography>4. Connect your wallet and send the transaction.</Typography>
         <Typography>
-          5. The tool will monitor the contract until it is unfrozen.
+          4. Wait until the transaction is processed. The tool will monitor the
+          contract until it is unfrozen.
         </Typography>
         <Typography>
           Support:{" "}
@@ -36,5 +51,5 @@ function Info() {
 export default Info;
 
 const StyledContainer = styled(Container)({
-  width:400
-})
+  width: 400,
+});

@@ -2,7 +2,7 @@ import { CircularProgress, Fade, styled } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { CSSProperties } from "react";
 import { ReactNode } from "react";
-import { StyledFlexRow } from "styles";
+import { StyledFlexRow } from "../styles";
 
 interface Props {
   children: ReactNode;
@@ -11,7 +11,7 @@ interface Props {
   className?: string;
   onClick?: () => void;
   style?: CSSProperties;
-  transparent?: boolean; 
+  transparent?: boolean;
 }
 
 function Button({
@@ -64,7 +64,7 @@ const StyledContainer = styled("button")<{
   transparent?: boolean;
 }>(({ theme, disabled, transparent }) => ({
   width: "fit-content",
-  height: transparent ? 'unset' : 44,
+  height: transparent ? "unset" : 44,
   borderRadius: 40,
   opacity: disabled ? 0.7 : 1,
   pointerEvents: disabled ? "none" : "all",

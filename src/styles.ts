@@ -1,7 +1,7 @@
 import { styled } from "@mui/material";
 import { Box } from "@mui/system";
 import { CSSProperties } from "react";
-import { theme } from "theme";
+import { theme } from "./theme";
 
 export const StyledFlexRow = styled(Box)(
   ({
@@ -54,7 +54,6 @@ export const globalStyles = {
   },
   ".MuiTooltip-tooltip": {
     background: `#EEEEEE!important`,
-  
   },
 };
 

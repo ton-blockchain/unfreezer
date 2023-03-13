@@ -6,7 +6,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { CssBaseline, GlobalStyles } from "@mui/material";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "theme";
-import { globalStyles } from "styles";
+import { globalStyles } from "./styles";
 import { SnackbarProvider } from "notistack";
 import App from "App";
 import { analytics } from "analytics";

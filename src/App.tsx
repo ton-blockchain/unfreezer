@@ -6,7 +6,7 @@ import {
   useRestoreConnection,
 } from "connection";
 import { useEffect } from "react";
-import { StyledFlexColumn, StyledGrid } from "styles";
+import { StyledFlexColumn, StyledGrid } from "./styles";
 import Info from "Info";
 import { Unfreeze } from "Unfreeze/Unfreeze";
 import { Footer } from "components";
@@ -37,9 +37,9 @@ function App() {
 export default App;
 
 const StyledApp = styled(StyledFlexColumn)({
-  minHeight:'100vh',
-  gap: 0
-})
+  minHeight: "100vh",
+  gap: 0,
+});
 
 const StyledContent = styled(StyledGrid)({
   paddingTop: 100,

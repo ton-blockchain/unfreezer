@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { Button, ConnectButton, Github } from "components";
-import { StyledFlexRow, StyledGrid } from "styles";
+import { StyledFlexRow, StyledGrid } from "../styles";
 import { makeElipsisAddress } from "utils";
 import { useState } from "react";
 import LogoImg from "assets/logo.svg";
@@ -22,7 +22,7 @@ export function Navbar() {
         <StyledFlexRow justifyContent="space-between" width="100%">
           <StyledLogo onClick={() => window.scrollTo(0, 0)}>
             <img src={LogoImg} />
-            <Typography>Unfreeze</Typography>
+            <Typography>Unfreezer</Typography>
           </StyledLogo>
           <StyledFlexRow style={{ width: "fit-content" }}>
             <ConnectSection />

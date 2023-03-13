@@ -6,7 +6,7 @@ import {
   TonhubProvider,
   TonWalletProvider,
 } from "@ton-defi.org/ton-connection";
-import { Address  } from "ton";
+import { Address } from "ton";
 import { isMobile } from "react-device-detect";
 import { LOCAL_STORAGE_PROVIDER, TX_FEE } from "config";
 import { WalletProvider, Provider } from "types";
@@ -167,4 +167,3 @@ export const useResetConnection = () => {
     reset();
   };
 };
-

@@ -1,6 +1,6 @@
 import { TextField, styled, Typography } from "@mui/material";
 import React from "react";
-import { StyledFlexColumn } from "styles";
+import { StyledFlexColumn } from "../styles";
 import { NumericFormat } from "react-number-format";
 
 interface Props {
@@ -45,6 +45,7 @@ interface NumberInputProps extends Props {
   value?: string | number;
   onChangeInteger?: (value?: number) => void;
   onChange?: (value: string) => void;
+  disabled?: boolean;
 }
 
 const NumberInput = (props: NumberInputProps) => {
@@ -53,6 +54,7 @@ const NumberInput = (props: NumberInputProps) => {
       {props.title && <Typography className="title">{props.title}</Typography>}
 
       <NumericFormat
+        disabled={props.disabled}
         onFocus={props.onFocus}
         onValueChange={(values, _sourceInfo) => {
           if (_sourceInfo.source !== "event") {
@@ -63,7 +65,7 @@ const NumberInput = (props: NumberInputProps) => {
           props.onChangeInteger?.(values.floatValue);
         }}
         placeholder={props.placeholder}
-        value={props.value || ""}
+        value={props.value ?? ""}
         customInput={StyledInput}
       />
       {props.error && <StyledError>{props.error}</StyledError>}
@@ -80,7 +82,7 @@ const StyledInput = styled("input")(({ theme }) => ({
   fontFamily: "inherit",
   border: `1px solid rgba(114, 138, 150, 0.4)`,
   color: theme.palette.text.primary,
-  textIndent:12,
+  textIndent: 12,
   "&::placeholder": {
     transition: "0.2s all",
     opacity: 0.7,
@@ -98,10 +100,10 @@ const StyledContainer = styled(StyledFlexColumn)({
   gap: 2,
   ".title": {
     fontSize: 16,
-    textAlign:'left',
-    width:'100%',
+    textAlign: "left",
+    width: "100%",
     fontWeight: 600,
-    marginBottom: 8
+    marginBottom: 8,
   },
   ".MuiTextField-root": {
     width: "100%",

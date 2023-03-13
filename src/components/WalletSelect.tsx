@@ -1,5 +1,5 @@
 import { Box, Fade, Skeleton, styled, Typography } from "@mui/material";
-import { StyledFlexColumn, StyledFlexRow } from "styles";
+import { StyledFlexColumn, StyledFlexRow } from "../styles";
 import { Popup } from "./Popup";
 import { QRCodeSVG } from "qrcode.react";
 import { ReactNode } from "react";
@@ -9,7 +9,7 @@ import {
   useOnWalletSelected,
   useResetConnection,
   useWallets,
-} from "connection";
+} from "../connection";
 import { isMobile } from "react-device-detect";
 import _ from "lodash";
 interface Props {
@@ -30,7 +30,7 @@ const useTonConnectWallets = () => {
 export function WalletSelect({ open, close }: Props) {
   const resetConnection = useResetConnection();
   const tonConnectWallets = useTonConnectWallets();
-  
+
   const {
     selectWalletTC,
     session,

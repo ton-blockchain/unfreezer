@@ -1,6 +1,6 @@
 import { Box, Skeleton, styled, Typography } from "@mui/material";
 import React, { forwardRef, ReactNode } from "react";
-import { StyledFlexColumn, StyledFlexRow } from "styles";
+import { StyledFlexColumn, StyledFlexRow } from "../styles";
 
 const Container = forwardRef(
   (
@@ -31,7 +31,9 @@ const Container = forwardRef(
           </StyledHeader>
         )}
 
-        <Box className='children'>{loading ? <Loader loaderAmount={loaderAmount} /> : children}</Box>
+        <Box className="children">
+          {loading ? <Loader loaderAmount={loaderAmount} /> : children}
+        </Box>
       </StyledContainer>
     );
   }

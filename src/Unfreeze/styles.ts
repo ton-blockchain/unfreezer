@@ -1,6 +1,6 @@
 import { Box, Skeleton, styled } from "@mui/material";
 import { Button, NumberInput, TextInput, Popup, Container } from "components";
-import { StyledFlexRow, textOverflow, StyledFlexColumn } from "styles";
+import { StyledFlexRow, textOverflow, StyledFlexColumn } from "../styles";
 
 export const StyledSubmit = styled(StyledFlexRow)({
   marginTop: 20,
@@ -47,20 +47,18 @@ export const StyledUnfreezePopup = styled(Popup)({
 
 export const StyledAmountInput = styled(NumberInput)({
   maxWidth: 120,
-  height:32,
+  height: 32,
   input: {
     textAlign: "center",
     textIndent: "0px",
   },
 });
 
-
 export const StyledChangeButton = styled(Button)({
   "*": {
     fontSize: 14,
   },
 });
-
 
 export const StyledUnfreezeDetails = styled(Container)<{ disabled: boolean }>(
   ({ disabled }) => ({

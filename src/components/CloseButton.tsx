@@ -1,6 +1,6 @@
-import { IconButton, styled } from '@mui/material';
-import React from 'react'
-import { GrClose } from 'react-icons/gr';
+import { IconButton, styled } from "@mui/material";
+import React from "react";
+import { GrClose } from "react-icons/gr";
 
 export function CloseButton({
   close,
@@ -15,7 +15,6 @@ export function CloseButton({
     </StyledClose>
   );
 }
-
 
 const StyledClose = styled(IconButton)({
   position: "absolute",
@@ -34,4 +33,3 @@ const StyledClose = styled(IconButton)({
     },
   },
 });
-
