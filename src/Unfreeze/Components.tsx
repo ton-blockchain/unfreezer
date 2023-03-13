@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { SxProps, Typography } from "@mui/material";
 import {
   AppTooltip,
   Button,
@@ -10,7 +10,7 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import { BsFillCheckCircleFill } from "react-icons/bs";
 import { IoWarning } from "react-icons/io5";
 import { useConnectionStore } from "store";
-import { StyledFlexColumn, StyledFlexRow, textOverflow } from "styles";
+import { StyledFlexColumn, StyledFlexRow, textOverflow } from "../styles";
 import {
   StyledAmountInput,
   StyledSubmit,
@@ -61,24 +61,70 @@ export const ExpectedStateInit = ({
   );
 };
 
-export const AmountToSend = ({
+export const AmountToRevive = ({
+  isLoading,
+  value,
+}: {
+  isLoading: boolean;
+  value?: number;
+}) => {
+  // TODO add tooltip
+  return (
+    <DetailRow isLoading={isLoading} title="Amount to revive:">
+      <StyledFlexRow justifyContent="flex-start">
+        <StyledAmountInput value={value} disabled />
+        <Typography>TON</Typography>
+      </StyledFlexRow>
+    </DetailRow>
+  );
+};
+
+export const MonthsInput = ({
   isLoading,
   onChange,
   value,
+  pricePerMonth,
 }: {
   isLoading: boolean;
   onChange: (value?: number) => void;
   value?: number;
+  pricePerMonth: number;
 }) => {
   return (
-    <DetailRow isLoading={isLoading} title="Amount to send:">
+    <DetailRow
+      isLoading={isLoading}
+      title="Months to add rent:"
+      sx={{ alignItems: "flex-start" }}
+    >
+      <StyledFlexColumn>
+        <StyledFlexRow justifyContent="flex-start">
+          <StyledAmountInput value={value} onChangeInteger={onChange} />
+        </StyledFlexRow>
+        <StyledFlexRow
+          sx={{ fontSize: 12, mt: -0.5 }}
+          justifyContent="flex-start"
+        >
+          Rent per month:{" "}
+          <NumberDisplay value={pricePerMonth} decimalScale={3} />
+          TON
+        </StyledFlexRow>
+      </StyledFlexColumn>
+    </DetailRow>
+  );
+};
+
+export const TotalAmount = ({
+  isLoading,
+  value,
+}: {
+  isLoading: boolean;
+  value?: number;
+}) => {
+  // TODO add tooltip
+  return (
+    <DetailRow isLoading={isLoading} title="Total amount:">
       <StyledFlexRow justifyContent="flex-start">
-        <StyledAmountInput
-          placeholder="Amount"
-          value={value}
-          onChangeInteger={onChange}
-        />
-        <Typography>TON</Typography>
+        <NumberDisplay value={value} decimalScale={3} /> TON
       </StyledFlexRow>
     </DetailRow>
   );
@@ -115,13 +161,15 @@ export const DetailRow = ({
   title,
   children,
   isLoading,
+  sx,
 }: {
   title: string;
   children: ReactNode;
   isLoading?: boolean;
+  sx?: SxProps;
 }) => {
   return (
-    <StyledDetailRow>
+    <StyledDetailRow sx={sx}>
       <Typography>{title}</Typography>
       {isLoading ? (
         <StyledLoader width={100} height={20} />
@@ -140,7 +188,7 @@ export const UnfreezeBlock = ({
 }: {
   initialUnfreezeBlock?: number;
   unfreezeBlock?: number;
-  onSubmit: (value: number) => void;
+  onSubmit: (value: number | undefined) => void;
   isLoading: boolean;
 }) => {
   const [showUnfreeze, setShowUnfreeze] = useState(false);
@@ -189,27 +237,25 @@ export const UnfreezeBlock = ({
       </StyledUnfreezePopup>
       <DetailRow isLoading={isLoading} title="Unfreeze block:">
         <Typography> {unfreezeBlock || "-"}</Typography>
-        {!!unfreezeBlock && (
+        {!unfreezeBlock && (
           <StyledChangeButton
             transparent={true}
             onClick={() => setShowUnfreeze(true)}
           >
-            Change
+            Set
           </StyledChangeButton>
         )}
-        {initialUnfreezeBlock &&
-          unfreezeBlock &&
-          unfreezeBlock !== initialUnfreezeBlock && (
-            <StyledChangeButton
-              transparent={true}
-              onClick={() => {
-                onSubmit(initialUnfreezeBlock);
-                setShowUnfreeze(false);
-              }}
-            >
-              Reset
-            </StyledChangeButton>
-          )}
+        {unfreezeBlock && unfreezeBlock !== initialUnfreezeBlock && (
+          <StyledChangeButton
+            transparent={true}
+            onClick={() => {
+              onSubmit(initialUnfreezeBlock);
+              setShowUnfreeze(false);
+            }}
+          >
+            Reset
+          </StyledChangeButton>
+        )}
       </DetailRow>
     </>
   );

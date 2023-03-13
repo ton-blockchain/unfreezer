@@ -1,6 +1,6 @@
 import { Typography, styled } from "@mui/material";
 import { GITHUB_URL } from "config";
-import { StyledFlexRow } from "styles";
+import { StyledFlexRow } from "../styles";
 import GithubLogo from "assets/github.svg";
 
 interface Props{

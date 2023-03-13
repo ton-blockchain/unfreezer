@@ -1,7 +1,7 @@
 import { Link as MuiLink, styled, Typography, useTheme } from "@mui/material";
 import React, { HTMLAttributeAnchorTarget, ReactNode } from "react";
 import {BiLinkExternal} from 'react-icons/bi'
-import { textOverflow } from "styles";
+import { textOverflow } from "../styles";
 
 export function Link({
   children,

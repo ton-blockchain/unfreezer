@@ -1,7 +1,7 @@
 import { Link, styled, Typography } from "@mui/material";
 import { Container } from "components";
 import React from "react";
-import { StyledFlexColumn } from "styles";
+import { StyledFlexColumn } from "./styles";
 
 function Info() {
   return (

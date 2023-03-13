@@ -6,7 +6,7 @@ import {
   useRestoreConnection,
 } from "connection";
 import { useEffect } from "react";
-import { StyledFlexColumn, StyledGrid } from "styles";
+import { StyledFlexColumn, StyledGrid } from "./styles";
 import Info from "Info";
 import { Unfreeze } from "Unfreeze/Unfreeze";
 import { Footer } from "components";

@@ -1,6 +1,6 @@
 import { Box, Skeleton, styled } from "@mui/material";
 import { Button, NumberInput, TextInput, Popup, Container } from "components";
-import { StyledFlexRow, textOverflow, StyledFlexColumn } from "styles";
+import { StyledFlexRow, textOverflow, StyledFlexColumn } from "../styles";
 
 export const StyledSubmit = styled(StyledFlexRow)({
   marginTop: 20,

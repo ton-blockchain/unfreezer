@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Typography } from "@mui/material";
 import { Container } from "components";
-import { StyledFlexColumn } from "styles";
-import { useAccountDetails, useUnfreezeCallback, useUnfreezeTxn } from "hooks";
+import { StyledFlexColumn } from "../styles";
+import { useUnfreezeCallback } from "lib/useUnfreezeCallback";
+import { useAccountDetails } from "lib/useAccountDetails";
+import { useUnfreezeTxn } from "lib/useUnfreezeTxn";
 import { Exmaple } from "../components/Exampe";
 import {
   StyledContainer,
@@ -11,38 +13,35 @@ import {
 } from "./styles";
 import {
   DetailRow,
-  AmountToSend,
+  AmountToRevive,
   ExpectedStateInit,
   ActionButton,
   UnfreezeBlock,
-  LatestStateInit,
   Balance,
+  TotalAmount,
 } from "./Components";
 import { useConnectionStore } from "store";
 import { useSearchParams } from "react-router-dom";
-import { Address } from "ton";
-/*
-TODOs => 
-- ton connect manifest => https://ton-community.github.io/unfreezer/, TON Unfreezer
-- icon
-- title in nav bar
-- add support for non-TonConnect wallets (or otherwise remove them from menu)
-- styling
-- loading indications
-- error indications
-
-*/
+import { MonthsInput } from "./Components";
 
 export function Unfreeze() {
   let [searchParams, setSearchParams] = useSearchParams();
   const [address, setAddress] = useState(searchParams.get("address") || "");
-  const [amount, setAmount] = useState<number | undefined>(0.1);
+  const [months, setMonths] = useState<number>(12);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
   const [modifiedUnfreezeBlock, setModifiedUnfreezeBlock] = useState<
     number | undefined
   >();
 
   const { data: accountDetails, isFetching: accoundDetailsLoading } =
-    useAccountDetails(address);
+    useAccountDetails(address, modifiedUnfreezeBlock);
+
+  useEffect(() => {
+    setTotalAmount(
+      months * parseFloat(accountDetails?.pricePerMonth ?? "0") +
+        parseFloat(accountDetails?.minAmountToSend ?? "0")
+    );
+  }, [months, accountDetails?.pricePerMonth, accountDetails?.minAmountToSend]);
 
   const { mutate: unfreeze, isLoading: txLoading } = useUnfreezeCallback();
   const { address: connectedWalletAddress } = useConnectionStore();
@@ -59,7 +58,7 @@ export function Unfreeze() {
     unfreeze({
       stateInit: unfreezeTxnData!.stateInit || "",
       address,
-      amount,
+      amount: totalAmount,
     });
   };
 
@@ -95,16 +94,17 @@ export function Unfreeze() {
         title="Unfreeze Details"
       >
         <StyledFlexColumn gap={15}>
-          <AmountToSend
+          <AmountToRevive
             isLoading={accoundDetailsLoading}
             value={parseFloat(accountDetails?.minAmountToSend ?? "0")}
-            onChange={setAmount}
           />
-          {/* <AmountToSend
+          <MonthsInput
             isLoading={accoundDetailsLoading}
-            value={parseFloat(accountDetails?.pricePerMonth ?? "0")}
-            onChange={setAmount}
-          /> */}
+            value={months}
+            onChange={(v) => v !== undefined && setMonths(v)}
+            pricePerMonth={parseFloat(accountDetails?.pricePerMonth ?? "0")}
+          />
+          <TotalAmount isLoading={accoundDetailsLoading} value={totalAmount} />
           <UnfreezeBlock
             isLoading={accoundDetailsLoading}
             unfreezeBlock={unfreezeBlock}
