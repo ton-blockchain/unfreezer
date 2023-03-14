@@ -7,7 +7,11 @@ import {
   NumberInput,
 } from "components";
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import { BsFillCheckCircleFill } from "react-icons/bs";
+import {
+  BsFillCheckCircleFill,
+  BsFillExclamationCircleFill,
+  BsFillInfoCircleFill,
+} from "react-icons/bs";
 import { IoWarning } from "react-icons/io5";
 import { useConnectionStore } from "store";
 import { StyledFlexColumn, StyledFlexRow, textOverflow } from "../styles";
@@ -33,13 +37,18 @@ export const ExpectedStateInit = ({
   const status = useMemo(() => {
     if (stateInitHash && !error) {
       return (
-        <BsFillCheckCircleFill
-          color="green"
-          style={{ minWidth: 22, minHeight: 22 }}
-        />
+        <AppTooltip
+          text={
+            "The frozen account state init hash matches the one found in the specified block"
+          }
+        >
+          <BsFillCheckCircleFill
+            color="green"
+            style={{ minWidth: 22, minHeight: 22 }}
+          />
+        </AppTooltip>
       );
-    }
-    if (!!error) {
+    } else if (!!error) {
       return (
         <AppTooltip text={error}>
           <IoWarning color="red" style={{ minWidth: 22, minHeight: 22 }} />
@@ -107,6 +116,13 @@ export const MonthsInput = ({
           Rent per month:{" "}
           <NumberDisplay value={pricePerMonth} decimalScale={3} />
           TON
+          <AppTooltip
+            text={
+              "Contract may choose to bounce the top-up amount designated for rent. The account will still be unfrozen. You can later issue a non-bounceable transaction to top-up the account."
+            }
+          >
+            <BsFillExclamationCircleFill color="gray" />
+          </AppTooltip>
         </StyledFlexRow>
       </StyledFlexColumn>
     </DetailRow>
@@ -236,7 +252,17 @@ export const UnfreezeBlock = ({
         </StyledFlexColumn>
       </StyledUnfreezePopup>
       <DetailRow isLoading={isLoading} title="Unfreeze block:">
-        <Typography> {unfreezeBlock || "-"}</Typography>
+        <StyledFlexRow justifyContent={"flex-start"}>
+          <Typography> {unfreezeBlock ?? "-"}</Typography>
+          <AppTooltip
+            text={
+              "The state of the account will be restored as it was at this block"
+            }
+          >
+            <BsFillInfoCircleFill />
+          </AppTooltip>
+        </StyledFlexRow>
+
         {!unfreezeBlock && (
           <StyledChangeButton
             transparent={true}
@@ -258,24 +284,6 @@ export const UnfreezeBlock = ({
         )}
       </DetailRow>
     </>
-  );
-};
-
-export const LatestStateInit = ({
-  isLoading,
-  stateInitHashToMatch,
-}: {
-  isLoading: boolean;
-  stateInitHashToMatch?: string;
-}) => {
-  return (
-    <DetailRow isLoading={isLoading} title="Latest state init hash:">
-      <AppTooltip style={textOverflow} text={stateInitHashToMatch}>
-        <Typography style={textOverflow}>
-          {stateInitHashToMatch || "-"}
-        </Typography>
-      </AppTooltip>
-    </DetailRow>
   );
 };
 
