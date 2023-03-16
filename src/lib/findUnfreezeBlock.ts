@@ -36,7 +36,7 @@ export async function findUnfreezeBlock(
   // we understand that v4 is always to be queried by a masterchain seqno
   const { account: accountDetails } = await tc4.getAccount(nextSeqno, account);
 
-  if (accountDetails.state.type === "frozen") {
+  if (accountDetails.state.type !== "active" && !!accountDetails.storageStat) {
     return findUnfreezeBlock(
       tc4,
       accountDetails,
@@ -44,7 +44,10 @@ export async function findUnfreezeBlock(
       overrideBlock,
       safetyNumber + 1
     );
-  } else if (accountDetails.state.type === "uninit") {
+  } else if (
+    !accountDetails.storageStat &&
+    accountDetails.state.type === "uninit"
+  ) {
     throw new Error(
       "Reached uninint block at seqno: " +
         nextSeqno +
