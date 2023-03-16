@@ -6,7 +6,7 @@ import { getClientV4 } from "./getClientV4";
 
 export function useUnfreezeTxn(
   accountStr: string,
-  stateInitHashToMatch?: string,
+  stateInitHashToMatch: string | null,
   unfreezeBlock?: number
 ) {
   const { showNotification } = useNotification();

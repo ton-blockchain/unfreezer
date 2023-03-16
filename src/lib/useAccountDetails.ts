@@ -44,6 +44,7 @@ export function useAccountDetails(
           accountState: frozenAccountDetails.state.type,
           isFrozen: false,
           balance,
+          stateInitHashToMatch: null,
           pricePerMonth: fromNano(
             calculateAmountForDelta(
               config18,
