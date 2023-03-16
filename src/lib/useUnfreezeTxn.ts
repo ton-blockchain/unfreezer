@@ -6,7 +6,7 @@ import { getClientV4 } from "./getClientV4";
 
 export function useUnfreezeTxn(
   accountStr: string,
-  stateInitHashToMatch?: string,
+  stateInitHashToMatch: string | null,
   unfreezeBlock?: number
 ) {
   const { showNotification } = useNotification();
@@ -43,7 +43,7 @@ export function useUnfreezeTxn(
       stateInit.writeTo(c);
       const stateInitHash = c.hash().toString("base64");
 
-      if (stateInitHashToMatch !== stateInitHash) {
+      if (!!stateInitHashToMatch && stateInitHashToMatch !== stateInitHash) {
         error = `Expecting state init hash ${stateInitHashToMatch}, got ${stateInitHash}`;
       }
 
@@ -56,7 +56,7 @@ export function useUnfreezeTxn(
     {
       onError: (error: any) =>
         showNotification({ variant: "error", message: error.toString() }),
-      enabled: !!unfreezeBlock && !!stateInitHashToMatch && !!accountStr,
+      enabled: !!unfreezeBlock && !!accountStr,
     }
   );
 }

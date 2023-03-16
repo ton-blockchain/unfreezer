@@ -50,7 +50,7 @@ export function Unfreeze() {
   const { data: unfreezeTxnData, isInitialLoading: unfreezeTxnDataLoading } =
     useUnfreezeTxn(
       address,
-      accountDetails?.stateInitHashToMatch,
+      accountDetails?.stateInitHashToMatch ?? null,
       unfreezeBlock
     );
 

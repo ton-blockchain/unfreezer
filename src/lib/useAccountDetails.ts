@@ -39,22 +39,20 @@ export function useAccountDetails(
       );
 
       // Account not frozen, so we return
-      if (frozenAccountDetails.state.type !== "frozen") {
+      if (frozenAccountDetails.state.type === "active") {
         return {
           accountState: frozenAccountDetails.state.type,
           isFrozen: false,
           balance,
-          pricePerMonth:
-            frozenAccountDetails.state.type === "active"
-              ? fromNano(
-                  calculateAmountForDelta(
-                    config18,
-                    MONTH_SEC,
-                    account.workChain === -1,
-                    frozenAccountDetails
-                  )
-                )
-              : "0",
+          stateInitHashToMatch: null,
+          pricePerMonth: fromNano(
+            calculateAmountForDelta(
+              config18,
+              MONTH_SEC,
+              account.workChain === -1,
+              frozenAccountDetails
+            )
+          ),
         };
       } else {
         let unfreezeBlock, lastPaid, activeAccountDetails;
@@ -77,7 +75,10 @@ export function useAccountDetails(
           isFrozen: true,
           unfreezeBlock,
           balance,
-          stateInitHashToMatch: frozenAccountDetails.state.stateHash,
+          stateInitHashToMatch:
+            frozenAccountDetails.state.type === "uninit"
+              ? null
+              : frozenAccountDetails.state.stateHash,
           workchain: account.workChain,
           minAmountToSend: lastPaid
             ? fromNano(
