@@ -1,12 +1,14 @@
 # TON Unfreezer
 
-A tool to unfreeze TON contracts that entered the `frozen` state due to running out of gas.
+A tool to unfreeze TON contracts that entered the `frozen` state due to running out of balance reserved for paying storage fees.
 
 ## Why do contracts get frozen?
 
 In TON, every contract that is deployed on-chain needs to pay rent occasionally from its TON coin balance. The more data the contract stores in state, the higher the rent. If the contract is deployed to the masterchain, these costs are significantly higher.
 
 If the contract runs out of gas for rent, it may become frozen. This is a cleanup mechanism that makes sure the system doesn't waste resources unless fees can be paid for consuming these resources.
+
+> Note that a contract whose state has never changed will instead enter the 'uninit' phase. In this case, it will still contain a pointer to the last block at which storage fees were paid, from which the contract can be restored.
 
 ## What happens during a freeze?
 
