@@ -1,6 +1,6 @@
 import ReactGA from "react-ga4";
 const init = () => {
-  ReactGA.initialize("G-K4HRF7DW9X");
+  ReactGA.initialize("G-PJLJSLZZ7J");
   ReactGA.send(window.location.pathname);
 };
 
