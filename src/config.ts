@@ -7,7 +7,7 @@ export const APPROVE_TX = "Please check wallet for pending transaction";
 export const TX_APPROVED_AND_PENDING = "Transaction pending";
 
 export const manifestUrl =
-  "https://ton-community.github.io/unfreezer/tonconnect-manifest.json";
+  "https://unfreezer.ton.org/tonconnect-manifest.json";
 
 export const TX_FEE = 0.5;
 
