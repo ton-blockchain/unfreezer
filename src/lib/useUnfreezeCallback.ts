@@ -2,11 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Address, TonClient, toNano } from "ton";
 import { getHttpEndpoint } from "@orbs-network/ton-access";
 import { useNotification } from "../components";
-import { handleMobileLink, waitForSeqno } from "utils";
+import { waitForSeqno } from "utils";
 import { TX_SUBMIT_SUCCESS_TEXT } from "config";
 import { useState } from "react";
-import { useConnectionStore } from "store";
-import BN from "bn.js";
+import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 
 export const MONTH_SEC = 24 * 3600 * 30;
 
@@ -22,7 +21,8 @@ type UnfreezeArgs = {
 };
 
 export const useUnfreezeCallback = () => {
-  const { address: connectedWalletAddress, connectorTC } = useConnectionStore();
+  const connectedWalletAddress = useTonWallet()?.account?.address;
+  const [connectorTC] = useTonConnectUI();
   const [txLoading, setTxLoading] = useState(false);
   const { showNotification } = useNotification();
   const queryClient = useQueryClient();
@@ -60,7 +60,6 @@ export const useUnfreezeCallback = () => {
 
         queryClient.invalidateQueries(["account_details"]);
       };
-      handleMobileLink(connectorTC);
 
       await connectorTC.sendTransaction({
         validUntil: Date.now() + 3 * 60 * 1000,

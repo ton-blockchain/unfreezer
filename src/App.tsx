@@ -1,36 +1,24 @@
 import { styled } from "@mui/material";
 import { Navbar } from "components/Navbar";
-import {
-  useConnectionEvenSubscription,
-  useEmbededWallet,
-  useRestoreConnection,
-} from "connection";
-import { useEffect } from "react";
 import { StyledFlexColumn, StyledGrid } from "./styles";
 import Info from "Info";
 import { Unfreeze } from "Unfreeze/Unfreeze";
 import { Footer } from "components";
-import { Box } from "@mui/system";
+import { TonConnectUIProvider } from "@tonconnect/ui-react";
+import { manifestUrl } from "./config";
 
 function App() {
-  const restoreConnection = useRestoreConnection();
-  const handleEmbededWallet = useEmbededWallet();
-  useConnectionEvenSubscription();
-
-  useEffect(() => {
-    restoreConnection();
-    handleEmbededWallet();
-  }, []);
-
   return (
-    <StyledApp>
-      <Navbar />
-      <StyledContent>
-        <Unfreeze />
-        <Info />
-      </StyledContent>
-      <Footer />
-    </StyledApp>
+    <TonConnectUIProvider manifestUrl={manifestUrl}>
+      <StyledApp>
+        <Navbar />
+        <StyledContent>
+          <Unfreeze />
+          <Info />
+        </StyledContent>
+        <Footer />
+      </StyledApp>
+    </TonConnectUIProvider>
   );
 }
 
