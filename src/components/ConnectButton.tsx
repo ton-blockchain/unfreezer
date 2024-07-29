@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "./Button";
-import { WalletSelect } from "./WalletSelect";
+import { useTonConnectModal } from "@tonconnect/ui-react";
 
 export function ConnectButton({
   text,
@@ -9,13 +9,12 @@ export function ConnectButton({
   text?: string;
   className?: string;
 }) {
-  const [open, setOpen] = useState(false);
+  const modal = useTonConnectModal();
   return (
     <>
-      <Button className={className} onClick={() => setOpen(true)}>
+      <Button className={className} onClick={() => modal.open()}>
         {text || "Connect wallet"}
       </Button>
-      <WalletSelect open={open} close={() => setOpen(false)} />
     </>
   );
 }

@@ -4,7 +4,6 @@ export * from "./Link";
 export * from "./Progress";
 export * from "./ConnectButton";
 export * from "./Input";
-export * from "./ConnectButton";
 export * from "./CloseButton";
 export * from "./Notification";
 export * from "./Github";

@@ -13,7 +13,6 @@ import {
   BsFillInfoCircleFill,
 } from "react-icons/bs";
 import { IoWarning } from "react-icons/io5";
-import { useConnectionStore } from "store";
 import { StyledFlexColumn, StyledFlexRow, textOverflow } from "../styles";
 import {
   StyledAmountInput,
@@ -24,6 +23,7 @@ import {
   StyledChangeButton,
   StyledUnfreezePopup,
 } from "./styles";
+import { useTonWallet } from "@tonconnect/ui-react";
 
 export const ExpectedStateInit = ({
   isLoading,
@@ -155,7 +155,7 @@ export const ActionButton = ({
   onSubmit: () => void;
   loading: boolean;
 }) => {
-  const { address: connectedWalletAddress } = useConnectionStore();
+  const connectedWalletAddress = useTonWallet()?.account?.address;
 
   if (!connectedWalletAddress) {
     return (

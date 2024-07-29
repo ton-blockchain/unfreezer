@@ -41,20 +41,6 @@ export const Logger = (log: any) => {
   }
 };
 
-export const handleMobileLink = (connectorTC?: TonConnect) => {
-  if (!isMobile) return;
-  const Tonkeeper = connectorTC?.wallet?.device.appName;
-
-  switch (Tonkeeper) {
-    case "Tonkeeper":
-      (window as any).location = "https://app.tonkeeper.com";
-      break;
-
-    default:
-      break;
-  }
-};
-
 export function nFormatter(num: number, digits = 2) {
   const lookup = [
     { value: 1, symbol: "" },

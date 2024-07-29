@@ -20,9 +20,9 @@ import {
   Balance,
   TotalAmount,
 } from "./Components";
-import { useConnectionStore } from "store";
 import { useSearchParams } from "react-router-dom";
 import { MonthsInput } from "./Components";
+import { useTonWallet } from "@tonconnect/ui-react";
 
 export function Unfreeze() {
   let [searchParams, setSearchParams] = useSearchParams();
@@ -44,7 +44,7 @@ export function Unfreeze() {
   }, [months, accountDetails?.pricePerMonth, accountDetails?.minAmountToSend]);
 
   const { mutate: unfreeze, isLoading: txLoading } = useUnfreezeCallback();
-  const { address: connectedWalletAddress } = useConnectionStore();
+  const connectedWalletAddress = useTonWallet()?.account?.address;
   const unfreezeBlock = modifiedUnfreezeBlock || accountDetails?.unfreezeBlock;
 
   const { data: unfreezeTxnData, isInitialLoading: unfreezeTxnDataLoading } =
