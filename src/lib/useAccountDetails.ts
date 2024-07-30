@@ -5,7 +5,7 @@ import { configParse18 } from "./configParse18";
 import { calculateAmountForDelta } from "./calculateAmountForDelta";
 import { findUnfreezeBlock } from "./findUnfreezeBlock";
 import { MONTH_SEC } from "./useUnfreezeCallback";
-import { getClientV4 } from "./getClientV4";
+import { executeV4Function, getClientsV4 } from "./getClientV4";
 
 export function useAccountDetails(
   accountStr: string,
@@ -17,21 +17,21 @@ export function useAccountDetails(
     async () => {
       const account = Address.parse(accountStr);
 
-      const tc4 = await getClientV4();
       let {
         last: { seqno },
-      } = await tc4.getLastBlock();
+      } = await executeV4Function((tc4) => tc4.getLastBlock());
 
       // Fetch current account details (under the assumption it's frozen)
-      const { account: frozenAccountDetails } = await tc4.getAccountLite(
-        seqno,
-        account
+      const { account: frozenAccountDetails } = await executeV4Function((tc4) =>
+        tc4.getAccountLite(seqno, account)
       );
 
       const balance = fromNano(frozenAccountDetails.balance.coins);
 
       // Fetch config param 18 which specifies storage prices / sec
-      const config18Raw = await tc4.getConfig(seqno, [18]);
+      const config18Raw = await executeV4Function((tc4) =>
+        tc4.getConfig(seqno, [18])
+      );
       const config18 = configParse18(
         Cell.fromBoc(
           Buffer.from(config18Raw.config.cell, "base64")
@@ -61,7 +61,6 @@ export function useAccountDetails(
           // Fetch the block number to unfreeze from
           ({ unfreezeBlock, lastPaid, activeAccountDetails } =
             await findUnfreezeBlock(
-              tc4,
               frozenAccountDetails,
               account,
               overrideBlockToReviveFrom
