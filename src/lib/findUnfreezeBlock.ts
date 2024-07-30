@@ -1,8 +1,8 @@
-import { Address, TonClient4 } from "ton";
+import { Address } from "ton";
 import { AccountDetails } from "types";
+import { executeV4Function } from "./getClientV4";
 
 export async function findUnfreezeBlock(
-  tc4: TonClient4,
   lastKnownAccountDetails: AccountDetails,
   account: Address,
   overrideBlock: number | undefined,
@@ -18,12 +18,12 @@ export async function findUnfreezeBlock(
     );
   }
 
-  let nextSeqno;
+  let nextSeqno: number;
 
   if (!overrideBlock) {
     // Shards from all chains at timestamp
-    const { shards: shardLastPaid } = await tc4.getBlockByUtime(
-      lastKnownAccountDetails.storageStat!.lastPaid
+    const { shards: shardLastPaid } = await executeV4Function((tc4) =>
+      tc4.getBlockByUtime(lastKnownAccountDetails.storageStat!.lastPaid)
     );
 
     // Get masterchain seqno (which we need to query v4)
@@ -34,11 +34,12 @@ export async function findUnfreezeBlock(
 
   // From this -> https://github.com/ton-community/ton-api-v4/blob/main/src/api/handlers/handleAccountGetLite.ts#L21
   // we understand that v4 is always to be queried by a masterchain seqno
-  const { account: accountDetails } = await tc4.getAccount(nextSeqno, account);
+  const { account: accountDetails } = await executeV4Function((tc4) =>
+    tc4.getAccount(nextSeqno, account)
+  );
 
   if (accountDetails.state.type !== "active" && !!accountDetails.storageStat) {
     return findUnfreezeBlock(
-      tc4,
       accountDetails,
       account,
       overrideBlock,

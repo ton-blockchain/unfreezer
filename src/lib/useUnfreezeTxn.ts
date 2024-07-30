@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { Address, Cell } from "ton";
-import { StateInit } from "ton";
+import { Address, Cell, StateInit } from "ton";
 import { useNotification } from "../components";
-import { getClientV4 } from "./getClientV4";
+import { executeV4Function } from "./getClientV4";
 
 export function useUnfreezeTxn(
   accountStr: string,
@@ -16,12 +15,10 @@ export function useUnfreezeTxn(
     async () => {
       const account = Address.parse(accountStr);
 
-      const tc4 = await getClientV4();
       let error;
 
-      const { account: accountDetails } = await tc4.getAccount(
-        unfreezeBlock!,
-        account
+      const { account: accountDetails } = await executeV4Function((tc4) =>
+        tc4.getAccount(unfreezeBlock!, account)
       );
 
       if (accountDetails.state.type !== "active") {
