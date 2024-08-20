@@ -56,13 +56,12 @@ export async function findUnfreezeBlock(
 
   console.log("blockToStartSearchFrom", blockNumber);
 
-  let found = false;
-  let account: Account;
+  let account: Account | undefined;
 
   let lastKnownActiveBlock = Number.MIN_SAFE_INTEGER;
   let lastKnownInactiveBlock = Number.MAX_SAFE_INTEGER;
 
-  while (!found && safety-- > 0) {
+  while (safety-- > 0) {
     console.log("Inspecting block", blockNumber);
 
     // From this -> https://github.com/ton-community/ton-api-v4/blob/main/src/api/handlers/handleAccountGetLite.ts#L21
@@ -102,9 +101,13 @@ export async function findUnfreezeBlock(
     }
   }
 
+  if (account?.state.type !== "active") {
+    throw new Error("Unable to find unfreeze block");
+  }
+
   return {
     unfreezeBlock: blockNumber,
-    lastPaid: account!.storageStat!.lastPaid,
+    lastPaid: account.storageStat?.lastPaid ?? -1,
     activeAccountDetails: account!,
   };
 }
