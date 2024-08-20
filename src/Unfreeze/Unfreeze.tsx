@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Typography } from "@mui/material";
 import { Container } from "components";
-import { StyledFlexColumn } from "../styles";
+import { StyledFlexColumn, StyledFlexRow, textOverflow } from "../styles";
 import { useUnfreezeCallback } from "lib/useUnfreezeCallback";
 import { useAccountDetails } from "lib/useAccountDetails";
 import { useUnfreezeTxn } from "lib/useUnfreezeTxn";
@@ -27,14 +27,15 @@ import { MonthsInput } from "./Components";
 export function Unfreeze() {
   let [searchParams, setSearchParams] = useSearchParams();
   const [address, setAddress] = useState(searchParams.get("address") || "");
+  const startBlockParam = searchParams.get("startBlock");
+  const [startBlock, setStartBlock] = useState(
+    startBlockParam ? parseInt(startBlockParam) : undefined
+  );
   const [months, setMonths] = useState<number>(12);
   const [totalAmount, setTotalAmount] = useState<number>(0);
-  const [modifiedUnfreezeBlock, setModifiedUnfreezeBlock] = useState<
-    number | undefined
-  >();
 
   const { data: accountDetails, isFetching: accoundDetailsLoading } =
-    useAccountDetails(address, modifiedUnfreezeBlock);
+    useAccountDetails(address, startBlock ?? undefined);
 
   useEffect(() => {
     setTotalAmount(
@@ -45,7 +46,7 @@ export function Unfreeze() {
 
   const { mutate: unfreeze, isLoading: txLoading } = useUnfreezeCallback();
   const { address: connectedWalletAddress } = useConnectionStore();
-  const unfreezeBlock = modifiedUnfreezeBlock || accountDetails?.unfreezeBlock;
+  const unfreezeBlock = accountDetails?.unfreezeBlock;
 
   const { data: unfreezeTxnData, isInitialLoading: unfreezeTxnDataLoading } =
     useUnfreezeTxn(
@@ -65,7 +66,7 @@ export function Unfreeze() {
   const onAddressChange = (value: string) => {
     setSearchParams(new URLSearchParams(`address=${value}`));
     setAddress(value);
-    setModifiedUnfreezeBlock(undefined);
+    setStartBlock(undefined);
   };
 
   return (
@@ -108,7 +109,7 @@ export function Unfreeze() {
           <UnfreezeBlock
             isLoading={accoundDetailsLoading}
             unfreezeBlock={unfreezeBlock}
-            onSubmit={setModifiedUnfreezeBlock}
+            onSubmit={setStartBlock}
             initialUnfreezeBlock={accountDetails?.unfreezeBlock}
           />
           <ExpectedStateInit
@@ -116,9 +117,14 @@ export function Unfreeze() {
             stateInitHash={unfreezeTxnData?.stateInitHash}
             error={unfreezeTxnData?.error}
           />
+          <DetailRow isLoading={!unfreezeTxnData} title="Size:">
+            {unfreezeTxnData?.sizeBits
+              ? `${(unfreezeTxnData.sizeBits / 8 / 1024).toFixed(2)}KB`
+              : "N/A"}
+          </DetailRow>
         </StyledFlexColumn>
         <ActionButton
-          disabled={!unfreezeTxnData?.stateInitHash}
+          disabled={!unfreezeTxnData?.stateInitHash || !!unfreezeTxnData.error}
           onSubmit={onSubmit}
           loading={txLoading}
         />

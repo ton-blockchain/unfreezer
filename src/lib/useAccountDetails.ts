@@ -7,30 +7,44 @@ import { findUnfreezeBlock } from "./findUnfreezeBlock";
 import { MONTH_SEC } from "./useUnfreezeCallback";
 import { executeV4Function, getClientsV4 } from "./getClientV4";
 
+export async function accountAtBlock(account: Address, block: number) {
+  // Fetch current account details (under the assumption it's frozen)
+  const { account: frozenAccountDetails } = await executeV4Function((tc4) =>
+    tc4.getAccount(block, account)
+  );
+
+  return frozenAccountDetails;
+}
+
+export async function accountAtLatestBlock(account: Address) {
+  const seqno = await latestBlock();
+
+  return [await accountAtBlock(account, seqno), seqno] as const;
+}
+
+export async function latestBlock() {
+  const {
+    last: { seqno },
+  } = await executeV4Function((tc4) => tc4.getLastBlock());
+  return seqno;
+}
+
 export function useAccountDetails(
-  accountStr: string,
+  addressStr: string,
   overrideBlockToReviveFrom?: number
 ) {
   const { showNotification } = useNotification();
   const query = useQuery(
-    ["account_details", accountStr, overrideBlockToReviveFrom],
+    ["account_details", addressStr, overrideBlockToReviveFrom],
     async () => {
-      const account = Address.parse(accountStr);
+      const address = Address.parse(addressStr);
+      const [initialAccount, latestBlock] = await accountAtLatestBlock(address);
 
-      let {
-        last: { seqno },
-      } = await executeV4Function((tc4) => tc4.getLastBlock());
-
-      // Fetch current account details (under the assumption it's frozen)
-      const { account: frozenAccountDetails } = await executeV4Function((tc4) =>
-        tc4.getAccountLite(seqno, account)
-      );
-
-      const balance = fromNano(frozenAccountDetails.balance.coins);
+      const balance = fromNano(initialAccount.balance.coins);
 
       // Fetch config param 18 which specifies storage prices / sec
       const config18Raw = await executeV4Function((tc4) =>
-        tc4.getConfig(seqno, [18])
+        tc4.getConfig(latestBlock, [18])
       );
       const config18 = configParse18(
         Cell.fromBoc(
@@ -39,9 +53,9 @@ export function useAccountDetails(
       );
 
       // Account not frozen, so we return
-      if (frozenAccountDetails.state.type === "active") {
+      if (initialAccount.state.type === "active") {
         return {
-          accountState: frozenAccountDetails.state.type,
+          accountState: initialAccount.state.type,
           isFrozen: false,
           balance,
           stateInitHashToMatch: null,
@@ -49,63 +63,59 @@ export function useAccountDetails(
             calculateAmountForDelta(
               config18,
               MONTH_SEC,
-              account.workChain === -1,
-              frozenAccountDetails
+              address.workChain === -1,
+              initialAccount
             )
           ),
         };
-      } else {
-        let unfreezeBlock, lastPaid, activeAccountDetails;
-
-        try {
-          // Fetch the block number to unfreeze from
-          ({ unfreezeBlock, lastPaid, activeAccountDetails } =
-            await findUnfreezeBlock(
-              frozenAccountDetails,
-              account,
-              overrideBlockToReviveFrom
-            ));
-        } catch (e: any) {
-          console.warn("Unable to find unfreeze block: " + e.toString());
-        }
-
-        return {
-          accountState: frozenAccountDetails.state.type,
-          isFrozen: true,
-          unfreezeBlock,
-          balance,
-          stateInitHashToMatch:
-            frozenAccountDetails.state.type === "uninit"
-              ? null
-              : frozenAccountDetails.state.stateHash,
-          workchain: account.workChain,
-          minAmountToSend: lastPaid
-            ? fromNano(
-                calculateAmountForDelta(
-                  config18,
-                  Date.now() / 1000 - lastPaid,
-                  account.workChain === -1,
-                  frozenAccountDetails
-                )
-              )
-            : undefined,
-          pricePerMonth: activeAccountDetails
-            ? fromNano(
-                calculateAmountForDelta(
-                  config18,
-                  MONTH_SEC,
-                  account.workChain === -1,
-                  activeAccountDetails
-                )
-              )
-            : undefined,
-        };
       }
+
+      let unfreezeBlock, lastPaid, activeAccountDetails;
+
+      try {
+        // Fetch the block number to unfreeze from
+        ({ unfreezeBlock, lastPaid, activeAccountDetails } =
+          await findUnfreezeBlock(address, overrideBlockToReviveFrom));
+      } catch (e: any) {
+        console.warn("Unable to find unfreeze block: " + e.toString());
+      }
+
+      return {
+        accountState: initialAccount.state.type,
+        isFrozen: true,
+        unfreezeBlock,
+        balance,
+        stateInitHashToMatch:
+          initialAccount.state.type === "uninit"
+            ? null
+            : initialAccount.state.stateHash,
+        workchain: address.workChain,
+        minAmountToSend: lastPaid
+          ? fromNano(
+              calculateAmountForDelta(
+                config18,
+                Date.now() / 1000 - lastPaid,
+                address.workChain === -1,
+                initialAccount
+              )
+            )
+          : undefined,
+        pricePerMonth: activeAccountDetails
+          ? fromNano(
+              calculateAmountForDelta(
+                config18,
+                MONTH_SEC,
+                address.workChain === -1,
+                initialAccount
+              )
+            )
+          : undefined,
+      };
     },
     {
       onError: (error: any) =>
         showNotification({ variant: "error", message: error.toString() }),
-      enabled: !!accountStr,
+      enabled: !!addressStr,
     }
   );
 
