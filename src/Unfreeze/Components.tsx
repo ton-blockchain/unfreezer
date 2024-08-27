@@ -213,7 +213,7 @@ export const UnfreezeBlock = ({
 
   useEffect(() => {
     setError(false);
-    setValue(unfreezeBlock);
+    setValue(unfreezeBlock ?? undefined);
   }, [unfreezeBlock, open]);
 
   const validateAndSubmit = () => {

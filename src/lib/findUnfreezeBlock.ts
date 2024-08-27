@@ -1,64 +1,113 @@
-import { Address } from "ton";
+import { Address, TonClient4 } from "ton";
 import { AccountDetails } from "types";
 import { executeV4Function } from "./getClientV4";
+import {
+  accountAtBlock,
+  accountAtLatestBlock,
+  latestBlock,
+} from "./useAccountDetails";
+
+type ExtractReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
+
+type Account = UnwrapPromise<
+  ExtractReturnType<TonClient4["getAccount"]>
+>["account"];
+
+async function blockFromUtime(utime: number) {
+  const { shards } = await executeV4Function((tc4) =>
+    tc4.getBlockByUtime(utime)
+  );
+
+  return shards.find((s) => s.workchain === -1)!.seqno;
+}
+
+function statusFromAccount(details: Account) {
+  console.log(details);
+  if (details.state.type === "uninit") {
+    return "uninit";
+  } else if (details.state.type === "active") {
+    return "active";
+  } else if (details.state.type === "frozen") {
+    if (details.storageStat) {
+      return "frozen";
+    } else {
+      throw new Error("Frozen account without storageStat");
+    }
+  }
+}
 
 export async function findUnfreezeBlock(
-  lastKnownAccountDetails: AccountDetails,
-  account: Address,
-  overrideBlock: number | undefined,
-  safetyNumber: number = 0
+  address: Address,
+  initialBlockNumber?: number
 ): Promise<{
   unfreezeBlock: number;
   lastPaid: number;
   activeAccountDetails: AccountDetails;
 }> {
-  if (safetyNumber === 30) {
-    throw new Error(
-      "Reached 30 iterations searching for active seqno. Aborting."
-    );
+  let safety = 130;
+
+  const initialDetails = await accountAtLatestBlock(address);
+  if (initialDetails[0].state.type === "active") {
+    throw new Error("Account is already active");
   }
 
-  let nextSeqno: number;
+  let blockNumber = initialBlockNumber ?? (await latestBlock());
 
-  if (!overrideBlock) {
-    // Shards from all chains at timestamp
-    const { shards: shardLastPaid } = await executeV4Function((tc4) =>
-      tc4.getBlockByUtime(lastKnownAccountDetails.storageStat!.lastPaid)
-    );
+  console.log("blockToStartSearchFrom", blockNumber);
 
-    // Get masterchain seqno (which we need to query v4)
-    nextSeqno = shardLastPaid.find((s) => s.workchain === -1)!.seqno - 1;
-  } else {
-    nextSeqno = overrideBlock;
+  let account: Account | undefined;
+
+  let lastKnownActiveBlock = Number.MIN_SAFE_INTEGER;
+  let lastKnownInactiveBlock = Number.MAX_SAFE_INTEGER;
+
+  while (safety-- > 0) {
+    console.log("Inspecting block", blockNumber);
+
+    // From this -> https://github.com/ton-community/ton-api-v4/blob/main/src/api/handlers/handleAccountGetLite.ts#L21
+    // we understand that v4 is always to be queried by a masterchain seqno
+    account = await accountAtBlock(address, blockNumber);
+    const status = statusFromAccount(account);
+
+    // Account is active so go forward to
+    if (status === "active") {
+      // See if we can find a newer block at which the account is active
+      lastKnownActiveBlock = Math.max(lastKnownActiveBlock, blockNumber);
+      blockNumber++;
+    } else if (status === "uninit") {
+      throw new Error("Account is uninit");
+    } else if (status === "frozen") {
+      // See if we can find an older block at which the account is frozen
+      lastKnownInactiveBlock = Math.min(lastKnownInactiveBlock, blockNumber);
+      blockNumber = Math.min(
+        await blockFromUtime(account.storageStat!.lastPaid!),
+        blockNumber - 1
+      );
+    }
+
+    console.log("Status", {
+      status,
+      lastKnownActiveBlock,
+      lastKnownInactiveBlock,
+    });
+
+    if (
+      status == "active" &&
+      lastKnownInactiveBlock - lastKnownActiveBlock === 1
+    ) {
+      console.log("Found active account at seqno: ", lastKnownActiveBlock);
+      blockNumber = lastKnownActiveBlock;
+      break;
+    }
   }
 
-  // From this -> https://github.com/ton-community/ton-api-v4/blob/main/src/api/handlers/handleAccountGetLite.ts#L21
-  // we understand that v4 is always to be queried by a masterchain seqno
-  const { account: accountDetails } = await executeV4Function((tc4) =>
-    tc4.getAccount(nextSeqno, account)
-  );
-
-  if (accountDetails.state.type !== "active" && !!accountDetails.storageStat) {
-    return findUnfreezeBlock(
-      accountDetails,
-      account,
-      overrideBlock,
-      safetyNumber + 1
-    );
-  } else if (
-    !accountDetails.storageStat &&
-    accountDetails.state.type === "uninit"
-  ) {
-    throw new Error(
-      "Reached uninint block at seqno: " +
-        nextSeqno +
-        ". Unable to detect active seqno."
-    );
+  if (account?.state.type !== "active") {
+    throw new Error("Unable to find unfreeze block");
   }
 
   return {
-    unfreezeBlock: nextSeqno,
-    lastPaid: lastKnownAccountDetails.storageStat!.lastPaid,
-    activeAccountDetails: accountDetails,
+    unfreezeBlock: blockNumber,
+    lastPaid: account.storageStat?.lastPaid ?? -1,
+    activeAccountDetails: account!,
   };
 }

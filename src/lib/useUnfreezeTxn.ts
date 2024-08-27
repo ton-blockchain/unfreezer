@@ -2,6 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Address, Cell, StateInit } from "ton";
 import { useNotification } from "../components";
 import { executeV4Function } from "./getClientV4";
+import { size } from "lodash";
+
+// https://github.com/ton-blockchain/ton/blob/master/crypto/block/mc-config.h#L391
+const maxSizeBits = 1 << 21;
 
 export function useUnfreezeTxn(
   accountStr: string,
@@ -44,8 +48,14 @@ export function useUnfreezeTxn(
         error = `Expecting state init hash ${stateInitHashToMatch}, got ${stateInitHash}`;
       }
 
+      const sizeBits = c.toBoc().byteLength * 8;
+      if (sizeBits > maxSizeBits) {
+        error = `State init is too big: ${sizeBits} bits, max is ${maxSizeBits}`;
+      }
+
       return {
         stateInit: c.toBoc().toString("base64"),
+        sizeBits: c.toBoc().byteLength * 8,
         stateInitHash,
         error,
       };
