@@ -1,5 +1,5 @@
 {
-  "url": "https://unfreezer.ton.org/tonconnect-manifest.json",
+  "url": "https://ton-connect.github.io/demo-dapp-with-react-ui/",
   "name": "TON Unfreezer",
-  "iconUrl": "https://unfreezer.ton.org/ton.png"
+  "iconUrl": "https://ton-connect.github.io/demo-dapp-with-react-ui/apple-touch-icon.png"
 }
