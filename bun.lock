@@ -22,7 +22,7 @@
         "react-dom": "^19",
         "tailwind-merge": "^3.5.0",
         "tailwindcss": "^4.2.2",
-        "txtracer-core": "^0.6.0",
+        "txtracer-core": "0.7.0",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -440,7 +440,7 @@
 
     "tweetnacl-util": ["tweetnacl-util@0.15.1", "", {}, "sha512-RKJBIj8lySrShN4w6i/BonWp2Z/uxwC3h4y7xsRrpP59ZboCd0GpEVsOnMDYLMmKBpYhb5TgHzZXy7wTfYFBRw=="],
 
-    "txtracer-core": ["txtracer-core@0.6.0", "", { "dependencies": { "@ton-community/func-js": "^0.10.0", "@ton/core": "^0.61.0", "@ton/sandbox": "^0.41.0", "@ton/ton": "^15.3.1", "axios": "^1.6.7" } }, "sha512-f5uEYAtBEcdbu9y5pzasercZboWU16tNWb8xNaCgvby2X81zevLGKc+gq8JCKog0Ms53fLB0sAN9PIacTtWwvQ=="],
+    "txtracer-core": ["txtracer-core@0.7.0", "", { "dependencies": { "@ton-community/func-js": "^0.10.0", "@ton/core": "^0.61.0", "@ton/sandbox": "^0.41.0", "@ton/ton": "^15.3.1", "axios": "^1.6.7" } }, "sha512-piIT75Mv5szIhjhtrO39gjVISP4fEJEsoUs7ksrjok4bbh6zuVYNUzXJNtZEvVoa6mDUFuhPgR+mEqhHB370oA=="],
 
     "ua-parser-js": ["ua-parser-js@1.0.41", "", { "bin": { "ua-parser-js": "script/cli.js" } }, "sha512-LbBDqdIC5s8iROCUjMbW1f5dJQTEFB1+KO9ogbvlb3nm9n4YHa5p4KTvFPWvh2Hs8gZMBuiB1/8+pdfe/tDPug=="],
 

@@ -29,7 +29,7 @@
     "react-dom": "^19",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.2",
-    "txtracer-core": "^0.6.0"
+    "txtracer-core": "0.7.0"
   },
   "devDependencies": {
     "@types/bun": "latest",
