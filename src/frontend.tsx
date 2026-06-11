@@ -3,9 +3,10 @@ import { createRoot } from "react-dom/client";
 import { TonConnectUIProvider, THEME } from "@tonconnect/ui-react";
 import { App } from "./App.tsx";
 
-// Absolute and subpath-safe: resolved against the current page, so it works
-// both on a custom domain root and under github.io/<repo>/
-const manifestUrl = new URL("tonconnect-manifest.json", window.location.href).toString();
+// Must be a PUBLIC url: the manifest is fetched by the wallet's backend
+// during connect, not by this page — localhost or a not-yet-deployed origin
+// yields MANIFEST_CONTENT_ERROR from the wallet.
+const manifestUrl = "https://unfreezer.ton.org/tonconnect-manifest.json";
 
 const savedTheme = localStorage.getItem("unf-theme");
 const initialTheme = savedTheme === "light" ? THEME.LIGHT : THEME.DARK;
