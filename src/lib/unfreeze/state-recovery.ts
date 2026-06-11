@@ -7,7 +7,12 @@ import { getShardAccountCell, toncenterApiKey } from "./toncenter.ts";
 import type { FreezeTxRef, Network, ProgressCallback, StateForUnfreeze } from "./types.ts";
 
 /** Hard cap on the StateInit size carried by the unfreeze message. */
-const MAX_STATE_INIT_BITS = 1 << 21;
+// The unfreeze message is broadcast by the wallet as an EXTERNAL message,
+// capped by config param 43 max_ext_msg_size = 65535 bytes. Keep ~1.5KB
+// margin for the wallet envelope (signature, headers, internal msg).
+// Note: the 2^21-bit limit applies to internal messages only and is NOT the
+// binding constraint for wallet-based unfreezing.
+const MAX_STATE_INIT_BYTES = 64_000;
 
 // Recover the account state right before the freeze transaction by replaying
 // its in-block predecessors in the TVM emulator (txtracer-core). Needed when
@@ -155,8 +160,8 @@ export async function getStateForUnfreeze(
     error = `Hash mismatch: expected ${stateInitHashToMatch}, got ${stateInitHash}`;
   }
 
-  if (sizeBits > MAX_STATE_INIT_BITS) {
-    error = `State init too big: ${sizeBits} bits, max ${MAX_STATE_INIT_BITS}`;
+  if (sizeBytes > MAX_STATE_INIT_BYTES) {
+    error = `State init too big to send from a wallet: ${(sizeBytes / 1024).toFixed(1)} KB, external message limit is 64 KB`;
   }
 
   return {
