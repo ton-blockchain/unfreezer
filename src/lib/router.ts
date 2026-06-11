@@ -17,7 +17,9 @@ function buildUrl(testnet: boolean, address?: string | null) {
   if (testnet) params.set("testnet", "true");
   if (address) params.set("address", address);
   const search = params.toString();
-  return search ? `/?${search}` : "/";
+  // Keep the current pathname so the app works under a subpath (GitHub Pages)
+  const base = window.location.pathname;
+  return search ? `${base}?${search}` : base;
 }
 
 function push(url: string) {

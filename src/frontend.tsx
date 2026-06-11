@@ -3,7 +3,9 @@ import { createRoot } from "react-dom/client";
 import { TonConnectUIProvider, THEME } from "@tonconnect/ui-react";
 import { App } from "./App.tsx";
 
-const manifestUrl = "/tonconnect-manifest.json";
+// Absolute and subpath-safe: resolved against the current page, so it works
+// both on a custom domain root and under github.io/<repo>/
+const manifestUrl = new URL("tonconnect-manifest.json", window.location.href).toString();
 
 const savedTheme = localStorage.getItem("unf-theme");
 const initialTheme = savedTheme === "light" ? THEME.LIGHT : THEME.DARK;

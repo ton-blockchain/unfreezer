@@ -8,7 +8,7 @@
     "dev:server": "bun --hot src/index.ts",
     "dev": "concurrently \"bun run dev:css\" \"bun run dev:server\"",
     "build:css": "bunx @tailwindcss/cli -i src/app.css -o src/index.css --minify",
-    "build": "bun run build:css && bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --splitting --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
+    "build": "bun run build:css && bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --splitting --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*' && cp -R public/. dist/",
     "start": "NODE_ENV=production bun src/index.ts"
   },
   "dependencies": {
