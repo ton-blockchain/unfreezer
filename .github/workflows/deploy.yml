@@ -1,27 +1,59 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Build and Deploy
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+
+      - name: Unit tests
+        run: bun test src/lib/unfreeze/fees.test.ts
+
+      - name: Build
+        run: bun run build
+
+      - name: Upload GitHub Pages artifact
+        if: github.repository == 'ton-blockchain/unfreezer' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy docs
+    if: github.repository == 'ton-blockchain/unfreezer' && github.ref == 'refs/heads/main'
+    needs: [ build ]
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
-      - name: install dependencies
-        run: yarn install
-      - name: test
-        run: yarn test
-      - name: Build
-        run: export NODE_OPTIONS="--max-old-space-size=4096" && yarn build
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: dist # The folder the action should deploy.
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

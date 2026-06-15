@@ -1,5 +1,5 @@
 {
-  "url": "https://unfreezer.ton.org/tonconnect-manifest.json",
+  "url": "https://unfreezer.ton.org",
   "name": "TON Unfreezer",
-  "iconUrl": "https://unfreezer.ton.org/ton.png"
+  "iconUrl": "https://unfreezer.ton.org/icon.png"
 }
