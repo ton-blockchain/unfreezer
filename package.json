@@ -2,6 +2,7 @@
   "name": "ton-unfreezer",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev:css": "bunx @tailwindcss/cli -i src/app.css -o src/index.css --watch",
