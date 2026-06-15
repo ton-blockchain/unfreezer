@@ -44,26 +44,24 @@ export function App() {
   return (
     <ThemeContext.Provider value={{ theme, toggle }}>
       <div className="min-h-full flex flex-col">
-        <header className="flex items-center justify-between px-7 h-[60px] bg-[#08080A] border-b border-white/6 sticky top-0 z-50 dark:bg-[#08080A] max-sm:px-4 max-sm:h-auto max-sm:flex-wrap max-sm:gap-2.5 max-sm:py-3" style={{ background: theme === "light" ? "#fff" : "#08080A", borderBottomColor: theme === "light" ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)" }}>
-          <div className="flex items-center gap-6 max-sm:gap-2.5 max-sm:w-full max-sm:justify-between">
-            <div className="flex items-center gap-2.5 text-[17px] font-bold max-sm:text-[15px]">
-              <div className="w-8 h-8 bg-[#0098EA] rounded-[9px] flex items-center justify-center text-white max-sm:w-7 max-sm:h-7 max-sm:rounded-[7px]">
-                <Snowflake className="size-4 max-sm:size-3.5" />
-              </div>
-              TON Unfreezer
+        <header className="flex items-center gap-2.5 px-7 h-[60px] bg-[#08080A] border-b border-white/6 sticky top-0 z-50 dark:bg-[#08080A] max-sm:px-4 max-sm:h-auto max-sm:flex-wrap max-sm:py-3" style={{ background: theme === "light" ? "#fff" : "#08080A", borderBottomColor: theme === "light" ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)" }}>
+          <div className="flex items-center gap-2.5 text-[17px] font-bold mr-auto max-sm:text-[15px]">
+            <div className="w-8 h-8 bg-[#0098EA] rounded-[9px] flex items-center justify-center text-white max-sm:w-7 max-sm:h-7 max-sm:rounded-[7px]">
+              <Snowflake className="size-4 max-sm:size-3.5" />
             </div>
+            TON Unfreezer
           </div>
-          <div className="flex items-center gap-2.5">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full size-10 max-sm:size-9"
-              style={{ background: theme === "light" ? "#F0F1F3" : "#19191B", color: theme === "light" ? "var(--foreground)" : "#fff" }}
-              onClick={toggle}
-              title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-            >
-              {theme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
-            </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full size-10 shrink-0 max-sm:size-9"
+            style={{ background: theme === "light" ? "#F0F1F3" : "#19191B", color: theme === "light" ? "var(--foreground)" : "#fff" }}
+            onClick={toggle}
+            title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+          >
+            {theme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
+          </Button>
+          <div className="flex items-center gap-2.5 max-sm:w-full max-sm:justify-between">
             <NetworkDropdown network={network} setTestnet={setTestnet} theme={theme} />
             <TonConnectButton />
           </div>
@@ -72,6 +70,23 @@ export function App() {
         <main className="flex-1 max-w-[960px] w-full mx-auto px-6 pt-9 pb-15 max-sm:px-4 max-sm:pt-6 max-sm:pb-12">
           <UnfreezePage network={network} initialAddress={address} onAddressChange={setAddress} />
         </main>
+
+        <footer
+          className="flex items-center justify-center px-7 h-[52px] border-t text-[14px] text-muted-foreground max-sm:px-4"
+          style={{ borderTopColor: theme === "light" ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)" }}
+        >
+          <span>
+            Created by{" "}
+            <a
+              href="https://t.me/toncore"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-[#0098EA] hover:underline"
+            >
+              TON Core
+            </a>
+          </span>
+        </footer>
       </div>
     </ThemeContext.Provider>
   );
